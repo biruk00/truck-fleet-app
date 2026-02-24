@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+
+@layer base {
+  :root {
+    --bg: #ffffff;
+    --surface: #f8fafc;
+    --text: #0f172a;
+    --muted: #64748b;
+    --border: #e2e8f0;
+
+    --primary: #f97316;
+    --primary-dark: #ea580c;
+
+    --emerald: #10b981;
+    --red: #ef4444;
+    --blue: #3b82f6;
+    --purple: #a855f7;
+    --amber: #f59e0b;
+  }
+
+  /* Basic Dark Mode Support for later */
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --bg: #020617;
+      --surface: #0f172a;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --border: #334155;
+    }
+  }
+
+  body {
+    background-color: var(--bg);
+    color: var(--text);
+    font-family:
+      "Inter",
+      system-ui,
+      -apple-system,
+      sans-serif;
+  }
+}
