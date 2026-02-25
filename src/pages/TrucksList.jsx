@@ -103,6 +103,7 @@ export default function TrucksList() {
 
     const date = new Date();
     const dateString = date.toLocaleDateString('en-GB', { day: '2-digit', month: '2-digit', year: 'numeric' });
+    const dayOfMonth = date.getDate(); 
     const timeGreeting = date.getHours() < 12 ? 'Morning' : 'Afternoon';
     const timeDisplay = date.toLocaleTimeString('en-US', { hour: '2-digit', minute: '2-digit' });
 
@@ -169,7 +170,8 @@ export default function TrucksList() {
         const grouped = groupBy(djUnload, 'current_location');
         for (const [loc, trks] of Object.entries(grouped)) {
           report += `UNLOADING @ ${loc !== 'Unknown' ? loc : '?'}\n`;
-          trks.forEach(t => report += `${t.plate_no} ${formatNote(t.note)}\n`);
+          // Append (date) to Unloading trucks in Djibouti section
+          trks.forEach(t => report += `${t.plate_no}${formatNote(t.note)} (${dayOfMonth})\n`);
           report += `\n`;
         }
       }
@@ -213,15 +215,19 @@ export default function TrucksList() {
         const grouped = groupBy(loading, 'current_location');
         for (const [loc, trks] of Object.entries(grouped)) {
           report += `LOADING @ ${loc !== 'Unknown' ? loc : '?'}\n`;
-          trks.forEach(t => report += `${t.plate_no} ${formatNote(t.note)}\n`);
+          trks.forEach(t => report += `${t.plate_no}${formatNote(t.note)}\n`);
         }
         report += `-------\n`;
+      } else {
+        // Place holder like in template
+        report += `LOADING\n-------\n`;
       }
 
       const unloading = activeBrandTrucks.filter(t => getStat(t, 'unloading'));
       if (unloading.length > 0) {
         report += `UNLOADING\n`;
-        unloading.forEach(t => report += `${t.plate_no} ==> ${t.current_location || '?'}${formatNote(t.note)}\n`);
+        // Append (date) to Unloading trucks in Brand section
+        unloading.forEach(t => report += `${t.plate_no} ==> ${t.current_location || '?'}${formatNote(t.note)} (${dayOfMonth})\n`);
         report += `\n`;
       }
 
@@ -258,14 +264,16 @@ export default function TrucksList() {
       report += `===========================\n`;
       report += `PARKED (${parkedTrucks.length})\n`;
       report += `----------\n`;
-      parkedTrucks.forEach(t => report += `${t.plate_no} =${formatNote(t.note)}\n`);
+      // Append (date) to Parked trucks
+      parkedTrucks.forEach(t => report += `${t.plate_no} =${formatNote(t.note)} (${dayOfMonth})\n`);
     }
 
     const garageTrucks = trucks.filter(t => getStat(t, 'garage'));
     if (garageTrucks.length > 0) {
       report += `===========================\n`;
       report += `GARAGE (${garageTrucks.length})\n`;
-      garageTrucks.forEach(t => report += `${t.plate_no} =${formatNote(t.note)}\n`);
+      // Append (date) to Garage trucks
+      garageTrucks.forEach(t => report += `${t.plate_no} =${formatNote(t.note)} (${dayOfMonth})\n`);
     }
 
     const nodeTrucks = trucks.filter(t => (t.status || '').toLowerCase().includes('node') || (t.status || '').toLowerCase().includes('no driver'));
