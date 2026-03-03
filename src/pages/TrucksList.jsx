@@ -172,25 +172,42 @@ export default function TrucksList() {
       !(t.note || '').toLowerCase().includes('galafi')
     );
 
+    const djLoadingAtDj = djActive.filter(t => 
+      getStat(t, 'loading') && 
+      (t.current_location || '').toLowerCase() === 'djibouti'
+    );
+
     // Fertlizer block (all loaded/unloading/ongoing elsewhere Djibouti trucks)
-    const djOthers = djActive.filter(t => !djCrossed.includes(t) && !djOngoingEmpty.includes(t));
+    const djOthers = djActive.filter(t => !djCrossed.includes(t) && !djOngoingEmpty.includes(t) && !djLoadingAtDj.includes(t));
 
     report += `DJIBOUTI (${djActive.length || '-'})\n`;
-    report += `-----\n`;
+    // report += `-----\n`;
+
+    if (djLoadingAtDj.length > 0) {
+      report += `LOADING AT DJIBOUTI (${djLoadingAtDj.length})\n`;
+      // report += `-------\n`;
+      djLoadingAtDj.forEach(t => report += `${t.plate_no}${formatNote(t.note)} (${getStatusDay(t)})\n`);
+      report += `=============================\n`;
+      report += `\n`;
+    }
+
     report += `Empty Trucks Crossed to DJIBOUTI\n`;
     report += `On ${dateString}(${djCrossed.length || '-'})\n`;
-    report += `-------\n`;
+    // report += `-------\n`;
     if (djCrossed.length > 0) {
       djCrossed.forEach(t => report += `${t.plate_no} ==> ${t.current_location || '?'}${formatNote(t.note)}\n`);
     }
 
     report += `=============================\n`;
+    report += `\n`;
     report += `ONGOING EMPTY TRUCKS TO DJIBOUTI (${djOngoingEmpty.length || '-'})\n`;
-    report += `-------------------\n`;
-    report += `============================\n`;
+    // report += `-------------------\n`;
+    // report += `============================\n`;
     if (djOngoingEmpty.length > 0) {
       djOngoingEmpty.forEach(t => report += `${t.plate_no} ==> ${t.current_location || '?'}${formatNote(t.note)}\n`);
     }
+     report += `============================\n`;
+     report += `\n`;
 
     if (djOthers.length > 0) {
       report += `FERTLIZER (${djOthers.length})\n`;
@@ -235,9 +252,11 @@ export default function TrucksList() {
           report += `LOADING ${loc !== 'Unknown' && loc ? '@ ' + loc : ''}\n`;
           trks.forEach(t => report += `${t.plate_no} ${formatNote(t.note)} (${getStatusDay(t)})\n`);
         }
-        report += `-------\n`;
+        // report += `-------\n`;
+        report += `\n`;
       } else {
         report += `LOADING\n-------\n`;
+        report += `\n`;
       }
 
       const unloading = activeBrandTrucks.filter(t => getStat(t, 'unloading'));
@@ -278,11 +297,11 @@ export default function TrucksList() {
     const parkedTrucks = getSpecials('parked');
     report += `===========================\n`;
     report += `PARKED (${parkedTrucks.length || '-'})\n`;
-    report += `----------\n`;
+    // report += `----------\n`;
     if (parkedTrucks.length > 0) {
       parkedTrucks.forEach(t => report += `${t.plate_no} =${formatNote(t.note)} (${getStatusDay(t)})\n`);
     }
-
+report += `\n`;
     const garageTrucks = getSpecials('garage');
     report += `===========================\n`;
     report += `GARAGE (${garageTrucks.length || '-'})\n`;
@@ -337,6 +356,7 @@ export default function TrucksList() {
 
       // Djibouti special routing states
       if (c === 'djibouti') {
+        if (s === 'loading' && (t.current_location || '').toLowerCase() === 'djibouti') return 'LOADING AT DJIBOUTI';
         if (dest === 'djibouti' && note.includes('galafi')) return 'Empty Trucks Crossed to DJIBOUTI';
         if (s === 'ongoing' && dest === 'djibouti') return 'ONGOING EMPTY TRUCKS TO DJIBOUTI';
         if (s === 'ongoing') return 'DJIBOUTI TO';
@@ -469,7 +489,23 @@ export default function TrucksList() {
   const statusCounts = { 'Loading': 0, 'Unloading': 0, 'Ongoing': 0, 'Oncoming': 0, 'Parked': 0, 'Garage': 0, 'Node': 0, 'Insurance': 0, 'Other': 0 };
   const categoryCounts = {};
 
+  // Category chips should always show the full counts across all trucks
   trucks.forEach(t => {
+    const cat = (t.category || 'Uncategorized').trim();
+    if (cat) categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+  });
+
+  // Status chips should reflect the current category and search, 
+  // but NOT be filtered by `statusFilter` itself (otherwise clicking a status hides the others).
+  const trucksForStatusCounts = trucks.filter(t => {
+    const matchSearch = Object.values(t).some(val => 
+      String(val).toLowerCase().includes(search.toLowerCase())
+    );
+    const matchCategory = categoryFilter ? t.category === categoryFilter : true;
+    return matchSearch && matchCategory;
+  });
+
+  trucksForStatusCounts.forEach(t => {
     const s = (t.status || 'Other').trim().toLowerCase().replace(/\s+/g, ' ').replace(/[^a-z ]/g, '');
     
     if (s.includes('unload')) statusCounts['Unloading']++;
@@ -481,9 +517,6 @@ export default function TrucksList() {
     else if (s.includes('node')) statusCounts['Node']++;
     else if (s.includes('insur')) statusCounts['Insurance']++;
     else statusCounts['Other']++;
-
-    const cat = (t.category || 'Uncategorized').trim();
-    if (cat) categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
   });
 
   const chipDefs = [
