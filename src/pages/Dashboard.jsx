@@ -88,96 +88,191 @@ export default function Dashboard() {
 
   if (loading) {
     return (
-      <div className="flex h-64 items-center justify-center">
-        <Loader className="w-8 h-8 text-orange-500 animate-spin" />
+      <div className="flex flex-col items-center justify-center min-h-[60vh] animate-pulse">
+        <div className="relative">
+          <div className="absolute inset-0 rounded-full blur-xl bg-orange-500/30 animate-ping"></div>
+          <Loader className="w-12 h-12 text-orange-500 animate-spin relative z-10" />
+        </div>
+        <p className="mt-6 text-slate-500 dark:text-slate-400 font-medium tracking-widest uppercase text-sm">
+          Initializing Workspace...
+        </p>
       </div>
     );
   }
 
-  return (
-    <div className="space-y-8">
-      
-      {/* FILTER CHIPS (Top Grid) */}
-      <section className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-4">
-        {chipDefs.map(c => {
-          const isActive = activeFilter === c.key;
-          const colorClass = CHIP_COLORS[c.key] || 'border-slate-500';
-          return (
-            <div
-              key={c.key}
-              onClick={() => setActiveFilter(c.key)}
-              className={`
-                relative bg-white dark:bg-slate-800 rounded-2xl p-4 border-l-4 shadow-sm hover:shadow-md cursor-pointer
-                transition-all duration-300 transform hover:-translate-y-1 overflow-hidden
-                ${colorClass} ${isActive ? 'ring-2 ring-orange-500/50 bg-orange-50 dark:bg-orange-500/10' : ''}
-              `}
-            >
-              {isActive && (
-                <div className="absolute top-0 right-0 w-16 h-16 bg-gradient-to-br from-white/0 to-white/10 rounded-bl-full pointer-events-none" />
-              )}
-              <div className="flex flex-col justify-center items-center h-full text-center space-y-1">
-                <span className={`text-2xl font-black ${c.key === 'all' ? 'text-orange-500' : 'text-slate-700 dark:text-slate-200'}`}>
-                  {c.count}
-                </span>
-                <span className="text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  {c.label}
-                </span>
-              </div>
-            </div>
-          );
-        })}
-      </section>
+  // Calculate percentages for progression bars
+  let totalForFiltered = 0;
+  if (activeFilter === 'all') {
+    totalForFiltered = trucks.length;
+  } else {
+    totalForFiltered = chipDefs.find(c => c.key === activeFilter)?.count || 0;
+  }
 
-      {/* TOTAL TRUCKS HERO CARD */}
-      <div className="w-full max-w-2xl mx-auto rounded-3xl overflow-hidden shadow-2xl bg-gradient-to-br from-slate-900 to-slate-800 border border-slate-700 transition-all duration-300 hover:shadow-orange-500/20 hover:-translate-y-2">
-        <div className="p-8 sm:p-12 text-center relative overflow-hidden">
-          {/* Decorative background shapes */}
-          <div className="absolute -top-24 -right-24 w-64 h-64 bg-orange-500/10 rounded-full blur-3xl pointer-events-none"></div>
-          <div className="absolute -bottom-24 -left-24 w-64 h-64 bg-blue-500/10 rounded-full blur-3xl pointer-events-none"></div>
+  return (
+    <div className="space-y-10 pb-12 animate-fade-in-up">
+      
+      {/* HEADER HERO SECTION */}
+      <div className="relative w-full rounded-[2rem] overflow-hidden bg-slate-900 border border-slate-700 shadow-2xl group">
+        
+        {/* Animated Background Gradients */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[150%] bg-gradient-to-l from-orange-500/20 to-transparent blur-3xl opacity-50 group-hover:opacity-70 transition-opacity duration-1000 animate-pulse-slow"></div>
+          <div className="absolute bottom-[10%] -left-[10%] w-[40%] h-[120%] bg-gradient-to-r from-blue-500/10 to-transparent blur-3xl opacity-50 group-hover:opacity-70 transition-opacity duration-1000"></div>
           
-          <div className="relative z-10 space-y-2">
-            <h2 className="text-8xl lg:text-9xl font-black text-transparent bg-clip-text bg-gradient-to-r from-orange-400 to-orange-600 drop-shadow-sm leading-none">
-              {trucks.length}
+          {/* Subtle grid pattern overlay */}
+          <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LCUyNTUsJTI1NSwtMC4wNSkiLz48L3N2Zz4=')] opacity-20"></div>
+        </div>
+        
+        <div className="relative z-10 p-10 sm:p-14 flex flex-col sm:flex-row items-center justify-between gap-8">
+          
+          <div className="space-y-4 text-center sm:text-left">
+            <div className="inline-flex items-center space-x-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+              <span className="text-xs font-semibold tracking-wider text-slate-300 uppercase">Live Systems Online</span>
+            </div>
+            
+            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
+              Command <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-amber-500">Center</span>
             </h2>
-            <p className="text-xl sm:text-2xl font-medium text-slate-300 tracking-wide uppercase">
-              Total Fleet Size
+            
+            <p className="text-slate-400 text-lg sm:text-xl font-medium max-w-lg">
+              Monitor, track, and manage your entire logistics network in real-time.
             </p>
           </div>
+
+          {/* Epic Number Display */}
+          <div className="relative group-hover:scale-105 transition-transform duration-500">
+            <div className="absolute inset-0 bg-orange-500/20 blur-2xl rounded-full"></div>
+            <div className="relative glass-card bg-slate-800/50 rounded-3xl p-8 flex flex-col items-center justify-center min-w-[200px] border-slate-600/50">
+              <span className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Total Fleet Size</span>
+              <span className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400 drop-shadow-lg leading-none">
+                {trucks.length}
+              </span>
+            </div>
+          </div>
+          
         </div>
       </div>
 
-      {/* 8 STATUS CARDS GRID */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
-        {Object.keys(STATUS_ICONS).map(status => {
-          // If a category filter is active, only match "all" for this display, or implement matching logic.
-          // For now, if activeFilter is NOT 'all', optionally dim the ones not matching. 
-          const isFilterActive = activeFilter !== 'all';
-          const matchCount = statusCounts[status];
-
-          return (
-            <div 
-              key={status}
-              className={`
-                bg-white dark:bg-slate-800 rounded-2xl p-6 border border-slate-200 dark:border-slate-700 shadow-sm
-                transition-all duration-300 hover:shadow-xl hover:-translate-y-1 flex items-center justify-between
-                ${isFilterActive ? 'opacity-50 hover:opacity-100 scale-95 hover:scale-100' : ''}
-              `}
-            >
-              <div className="space-y-1">
-                <p className="text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">
-                  {status}
-                </p>
-                <div className={`text-4xl font-black ${STATUS_COLORS[status]}`}>
-                  {matchCount}
+      {/* HORIZONTAL CATEGORY NAVIGATION */}
+      <section className="relative">
+        <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400 mb-4 px-2">
+          Fleet Segments
+        </h3>
+        
+        <div className="flex overflow-x-auto pb-4 hide-scrollbar snap-x snap-mandatory gap-4 px-2">
+          {chipDefs.map(c => {
+            const isActive = activeFilter === c.key;
+            // Generate a color theme per chip
+            let themeFrom = 'from-slate-100';
+            let themeTo = 'to-slate-200';
+            let textActive = 'text-slate-800';
+            let darkThemeFrom = 'dark:from-slate-800';
+            let darkThemeTo = 'dark:to-slate-900';
+            let darkTextActive = 'dark:text-white';
+            
+            if (c.key === 'all') { themeFrom = 'from-orange-400'; themeTo = 'to-orange-600'; textActive = 'text-white'; darkThemeFrom = 'dark:from-orange-500'; darkThemeTo = 'dark:to-orange-700'; }
+            if (c.key === 'Djibouti') { themeFrom = 'from-blue-400'; themeTo = 'to-blue-600'; textActive = 'text-white'; darkThemeFrom = 'dark:from-blue-500'; darkThemeTo = 'dark:to-blue-700'; }
+            if (c.key === 'Walia') { themeFrom = 'from-amber-400'; themeTo = 'to-amber-500'; textActive = 'text-white'; darkThemeFrom = 'dark:from-amber-500'; darkThemeTo = 'dark:to-amber-600'; }
+            if (c.key === 'BGI') { themeFrom = 'from-purple-400'; themeTo = 'to-purple-600'; textActive = 'text-white'; darkThemeFrom = 'dark:from-purple-500'; darkThemeTo = 'dark:to-purple-700'; }
+            if (c.key === 'Leshato') { themeFrom = 'from-pink-400'; themeTo = 'to-pink-600'; textActive = 'text-white'; darkThemeFrom = 'dark:from-pink-500'; darkThemeTo = 'dark:to-pink-700'; }
+            
+            return (
+              <button
+                key={c.key}
+                onClick={() => setActiveFilter(c.key)}
+                className={`
+                  snap-start flex-none relative overflow-hidden rounded-2xl min-w-[140px] p-5 text-left transition-all duration-300
+                  ${isActive 
+                    ? `bg-gradient-to-br ${themeFrom} ${themeTo} ${darkThemeFrom} ${darkThemeTo} shadow-lg shadow-${themeFrom.split('-')[1]}-500/30 -translate-y-1` 
+                    : `glass-card hover:-translate-y-1 hover:bg-white dark:hover:bg-slate-800 border-transparent`}
+                `}
+              >
+                {isActive && (
+                  <div className="absolute top-0 right-0 w-16 h-16 bg-white/20 rounded-full blur-xl -mr-8 -mt-8"></div>
+                )}
+                <div className="relative z-10 flex flex-col gap-1">
+                  <span className={`text-[10px] sm:text-xs font-bold uppercase tracking-wider ${isActive ? 'text-white/80' : 'text-slate-500 dark:text-slate-400'}`}>
+                    {c.label}
+                  </span>
+                  <span className={`text-3xl font-black ${isActive ? textActive + ' ' + darkTextActive : 'text-slate-800 dark:text-slate-200'}`}>
+                    {c.count}
+                  </span>
                 </div>
+              </button>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* METRICS GRID */}
+      <section>
+        <div className="flex items-center justify-between px-2 mb-4">
+          <h3 className="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+            Real-time Status ({activeFilter.toUpperCase()})
+          </h3>
+          <span className="text-xs font-medium text-slate-400">
+            {totalForFiltered} trucks in view
+          </span>
+        </div>
+        
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6">
+          {Object.keys(STATUS_ICONS).map((status, idx) => {
+            const isFilterActive = activeFilter !== 'all';
+            const matchCount = statusCounts[status] || 0;
+            
+            // Progress Bar Logic
+            const percentage = totalForFiltered > 0 ? Math.round((matchCount / totalForFiltered) * 100) : 0;
+            
+            // Match color variable from tailwind mapping
+            const colorClassRaw = STATUS_COLORS[status]; // e.g. text-emerald-500
+            const colorName = colorClassRaw.split('-')[1]; // e.g. emerald
+            
+            return (
+              <div 
+                key={status}
+                style={{ animationDelay: `${idx * 50}ms` }}
+                className={`
+                  glass-card rounded-3xl p-6 relative overflow-hidden group
+                  ${isFilterActive ? 'transform transition-all' : ''}
+                  animate-fade-in-up
+                `}
+              >
+                {/* Visual Flair Header */}
+                <div className="flex justify-between items-start mb-6 relative z-10">
+                  <div className={`p-3 rounded-2xl bg-${colorName}-50 dark:bg-${colorName}-900/20 text-${colorName}-500 transition-transform duration-300 group-hover:scale-110 group-hover:rotate-3`}>
+                    {STATUS_ICONS[status]}
+                  </div>
+                  <div className={`text-3xl font-black ${STATUS_COLORS[status]}`}>
+                    {matchCount}
+                  </div>
+                </div>
+
+                {/* Content */}
+                <div className="relative z-10 space-y-4">
+                  <div className="flex justify-between items-end">
+                    <p className="text-sm font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                      {status}
+                    </p>
+                    <span className="text-xs font-semibold text-slate-400">{percentage}%</span>
+                  </div>
+                  
+                  {/* Premium Progress Bar */}
+                  <div className="h-2 w-full bg-slate-100 dark:bg-slate-800 rounded-full overflow-hidden">
+                    <div 
+                      className={`h-full rounded-full transition-all duration-1000 ease-out bg-${colorName}-500`}
+                      style={{ width: `${Math.max(percentage, 2)}%` }} // At least show a sliver so it's visible
+                    />
+                  </div>
+                </div>
+                
+                {/* Background Glow on Hover */}
+                <div className={`absolute -bottom-10 -right-10 w-32 h-32 bg-${colorName}-400/10 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none`}></div>
               </div>
-              <div className="p-4 bg-slate-50 dark:bg-slate-900/50 rounded-2xl">
-                {STATUS_ICONS[status]}
-              </div>
-            </div>
-          );
-        })}
-      </div>
+            );
+          })}
+        </div>
+      </section>
 
     </div>
   );
