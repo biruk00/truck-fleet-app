@@ -62,8 +62,15 @@ export default function Dashboard() {
 
   // Compile statistics
   trucks.forEach(t => {
+    const cat = (t.category || 'Uncategorized').trim();
+    if (cat) categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
+
+    // Filter status counts if a specific category is selected
+    if (activeFilter !== 'all' && cat.toLowerCase() !== activeFilter.toLowerCase()) {
+      return;
+    }
+
     const s = (t.status || 'Other').trim().toLowerCase().replace(/\s+/g, ' ').replace(/[^a-z ]/g, '');
-    
     if (s.includes('unload')) statusCounts['Unloading']++;
     else if (s.includes('load')) statusCounts['Loading']++;
     else if (s.includes('ongoin')) statusCounts['Ongoing']++;
@@ -73,19 +80,18 @@ export default function Dashboard() {
     else if (s.includes('node')) statusCounts['Node']++;
     else if (s.includes('insur')) statusCounts['Insurance']++;
     else statusCounts['Other']++;
-
-    const cat = (t.category || 'Uncategorized').trim();
-    if (cat) categoryCounts[cat] = (categoryCounts[cat] || 0) + 1;
   });
+
+  const defaultCategories = ['Djibouti', 'Walia', 'BGI', 'Leshato', 'Habesha', 'Unilever'];
+  const allCategories = [...new Set([...defaultCategories, ...Object.keys(categoryCounts)])].filter(c => c !== 'Uncategorized');
 
   const chipDefs = [
     { key: 'all', label: 'ALL', count: trucks.length },
-    { key: 'Djibouti', label: 'DJIBOUTI', count: categoryCounts['Djibouti'] || 0 },
-    { key: 'Walia', label: 'WALIA', count: categoryCounts['Walia'] || 0 },
-    { key: 'BGI', label: 'BGI', count: categoryCounts['BGI'] || 0 },
-    { key: 'Leshato', label: 'LESHATO', count: categoryCounts['Leshato'] || 0 },
-    { key: 'Habesha', label: 'HABESHA', count: categoryCounts['Habesha'] || 0 },
-    { key: 'Unilever', label: 'UNILEVER', count: categoryCounts['Unilever'] || 0 },
+    ...allCategories.map(cat => ({
+      key: cat,
+      label: cat.toUpperCase(),
+      count: categoryCounts[cat] || 0
+    }))
   ];
 
   if (loading) {
@@ -173,11 +179,21 @@ export default function Dashboard() {
             let darkThemeTo = 'dark:to-slate-900';
             let darkTextActive = 'dark:text-white';
             
-            if (c.key === 'all') { themeFrom = 'from-orange-400'; themeTo = 'to-orange-600'; textActive = 'text-white'; darkThemeFrom = 'dark:from-orange-500'; darkThemeTo = 'dark:to-orange-700'; }
-            if (c.key === 'Djibouti') { themeFrom = 'from-blue-400'; themeTo = 'to-blue-600'; textActive = 'text-white'; darkThemeFrom = 'dark:from-blue-500'; darkThemeTo = 'dark:to-blue-700'; }
-            if (c.key === 'Walia') { themeFrom = 'from-amber-400'; themeTo = 'to-amber-500'; textActive = 'text-white'; darkThemeFrom = 'dark:from-amber-500'; darkThemeTo = 'dark:to-amber-600'; }
-            if (c.key === 'BGI') { themeFrom = 'from-purple-400'; themeTo = 'to-purple-600'; textActive = 'text-white'; darkThemeFrom = 'dark:from-purple-500'; darkThemeTo = 'dark:to-purple-700'; }
-            if (c.key === 'Leshato') { themeFrom = 'from-pink-400'; themeTo = 'to-pink-600'; textActive = 'text-white'; darkThemeFrom = 'dark:from-pink-500'; darkThemeTo = 'dark:to-pink-700'; }
+             if (c.key === 'all') { themeFrom = 'from-orange-400'; themeTo = 'to-orange-600'; textActive = 'text-white'; darkThemeFrom = 'dark:from-orange-500'; darkThemeTo = 'dark:to-orange-700'; }
+            else if (c.key === 'Djibouti') { themeFrom = 'from-blue-400'; themeTo = 'to-blue-600'; textActive = 'text-white'; darkThemeFrom = 'dark:from-blue-500'; darkThemeTo = 'dark:to-blue-700'; }
+            else if (c.key === 'Walia') { themeFrom = 'from-amber-400'; themeTo = 'to-amber-500'; textActive = 'text-white'; darkThemeFrom = 'dark:from-amber-500'; darkThemeTo = 'dark:to-amber-600'; }
+            else if (c.key === 'BGI') { themeFrom = 'from-purple-400'; themeTo = 'to-purple-600'; textActive = 'text-white'; darkThemeFrom = 'dark:from-purple-500'; darkThemeTo = 'dark:to-purple-700'; }
+            else if (c.key === 'Leshato') { themeFrom = 'from-pink-400'; themeTo = 'to-pink-600'; textActive = 'text-white'; darkThemeFrom = 'dark:from-pink-500'; darkThemeTo = 'dark:to-pink-700'; }
+            else if (c.key === 'Habesha') { themeFrom = 'from-amber-500'; themeTo = 'to-amber-600'; textActive = 'text-white'; darkThemeFrom = 'dark:from-amber-600'; darkThemeTo = 'dark:to-amber-700'; }
+            else if (c.key === 'Unilever') { themeFrom = 'from-orange-400'; themeTo = 'to-orange-500'; textActive = 'text-white'; darkThemeFrom = 'dark:from-orange-500'; darkThemeTo = 'dark:to-orange-600'; }
+            else {
+              // Custom category fallback theme: Elegant Teal
+              themeFrom = 'from-teal-400';
+              themeTo = 'to-teal-600';
+              textActive = 'text-white';
+              darkThemeFrom = 'dark:from-teal-500';
+              darkThemeTo = 'dark:to-teal-700';
+            }
             
             return (
               <button

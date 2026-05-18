@@ -260,7 +260,8 @@ export default function TrucksList() {
     }
 
     // --- BRANDS SECTION ---
-    const brands = ['Walia', 'BGI', 'Leshato', 'Habesha', 'Afer', 'Unilever'];
+    const dbBrands = [...new Set(trucks.map(t => t.category).filter(Boolean))].filter(c => c.toLowerCase() !== 'djibouti');
+    const brands = [...new Set(['Walia', 'BGI', 'Leshato', 'Habesha', 'Afer', 'Unilever', ...dbBrands])];
     brands.forEach(brand => {
       const brandTrucks = trucks.filter(t => getCat(t, brand));
       const activeBrandTrucks = brandTrucks.filter(isActiveTruck);
@@ -554,15 +555,16 @@ export default function TrucksList() {
     else statusCounts['Other']++;
   });
 
+  const defaultCategories = ['Djibouti', 'Walia', 'BGI', 'Leshato', 'Habesha', 'Afer', 'Unilever'];
+  const allCategories = [...new Set([...defaultCategories, ...Object.keys(categoryCounts)])].filter(c => c !== 'Uncategorized');
+
   const chipDefs = [
     { key: 'all', label: 'ALL', count: trucks.length },
-    { key: 'Djibouti', label: 'DJIBOUTI', count: categoryCounts['Djibouti'] || 0 },
-    { key: 'Walia', label: 'WALIA', count: categoryCounts['Walia'] || 0 },
-    { key: 'BGI', label: 'BGI', count: categoryCounts['BGI'] || 0 },
-    { key: 'Leshato', label: 'LESHATO', count: categoryCounts['Leshato'] || 0 },
-    { key: 'Habesha', label: 'HABESHA', count: categoryCounts['Habesha'] || 0 },
-    { key: 'Afer', label: 'AFER', count: categoryCounts['Afer'] || 0 },
-    { key: 'Unilever', label: 'Unilever', count: categoryCounts['Unilever'] || 0 },
+    ...allCategories.map(cat => ({
+      key: cat,
+      label: cat.toUpperCase(),
+      count: categoryCounts[cat] || 0
+    }))
   ];
 
   const STATUS_ICONS = {

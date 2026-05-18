@@ -10,6 +10,7 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState(null);
+  const [categoriesList, setCategoriesList] = useState(CATEGORIES);
 
   const [formData, setFormData] = useState({
     plate_no: '',
@@ -21,10 +22,24 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
     note: ''
   });
 
+  const fetchExistingCategories = async () => {
+    try {
+      const { data, error } = await supabase.from('trucks').select('category');
+      if (error) throw error;
+      if (data) {
+        const uniqueDbCats = [...new Set(data.map(t => t.category).filter(Boolean))];
+        setCategoriesList(prev => [...new Set([...prev, ...uniqueDbCats])]);
+      }
+    } catch (err) {
+      console.error('Error fetching categories:', err);
+    }
+  };
+
   // Reset or fetch when opened
   useEffect(() => {
     if (isOpen) {
       setError(null);
+      fetchExistingCategories();
       if (isEditing) {
         fetchTruck();
       } else {
@@ -205,15 +220,18 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
                   <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                     Category
                   </label>
-                  <select
+                  <input
+                    type="text"
                     name="category"
+                    list="categories-list"
                     value={formData.category}
                     onChange={handleChange}
+                    placeholder="Select or type category..."
                     className="w-full px-4 py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-bold shadow-inner outline-none text-slate-900 dark:text-white"
-                  >
-                    <option value="">— Select Category —</option>
-                    {CATEGORIES.map(c => <option key={c} value={c}>{c}</option>)}
-                  </select>
+                  />
+                  <datalist id="categories-list">
+                    {categoriesList.map(c => <option key={c} value={c} />)}
+                  </datalist>
                 </div>
 
                 <div className="space-y-1.5">
