@@ -167,6 +167,17 @@ bot.onText(/\/all/, async (msg) => {
 
     // HELPER: Returns "DD/Mon" e.g. "8/Mar" for when the truck entered its current status
     const getStatusDay = (t) => {
+      // If there is a number in the note, that number represents the arrival date (day of the month)
+      const cleanNoteText = (t.note || '').replace(/^\[.*?\]\s*/, '').trim();
+      const numMatch = cleanNoteText.match(/\b\d+\b/);
+      if (numMatch) {
+        const dayNum = parseInt(numMatch[0], 10);
+        if (dayNum >= 1 && dayNum <= 31) {
+          const mon = date.toLocaleString('en-US', { month: 'short' });
+          return `${dayNum}/${mon}`;
+        }
+      }
+
       const plateHistory = historyRecords.filter(h => h.plate_no === t.plate_no);
       let earliestStreakDate = null;
       if (plateHistory.length > 0) {
@@ -187,11 +198,27 @@ bot.onText(/\/all/, async (msg) => {
     const getCat = (t, cat) => (t.category || '').toLowerCase() === cat.toLowerCase();
     const getStat = (t, stat) => (t.status || '').toLowerCase() === stat.toLowerCase();
     const formatNote = (note) => note ? ` ${note.trim()}` : '';
-    const groupBy = (array, key) => array.reduce((result, item) => {
-      const k = item[key] || 'Unknown';
+    const groupBy = (array, keyOrFn) => array.reduce((result, item) => {
+      const k = typeof keyOrFn === 'function' ? keyOrFn(item) : (item[keyOrFn] || 'Unknown');
       (result[k] = result[k] || []).push(item);
       return result;
     }, {});
+
+    const getCargoType = (t) => {
+      const match = (t.note || '').match(/^\[(.*?)\]/);
+      return match ? match[1].trim() : 'Fertilizer';
+    };
+    const getActualNote = (t) => {
+      let text = (t.note || '').replace(/^\[.*?\]\s*/, '').trim();
+      const numMatch = text.match(/\b\d+\b/);
+      if (numMatch) {
+        const dayNum = parseInt(numMatch[0], 10);
+        if (dayNum >= 1 && dayNum <= 31) {
+          text = text.replace(new RegExp(`\\b${numMatch[0]}\\b`), '').replace(/\s+/g, ' ').trim();
+        }
+      }
+      return text;
+    };
 
     const isInactiveStatus = (status) => {
       const s = (status || '').toLowerCase();
@@ -209,19 +236,19 @@ bot.onText(/\/all/, async (msg) => {
     
     const djCrossed = djActive.filter(t => 
       (t.destination || '').toLowerCase() === 'djibouti' && 
-      (t.note || '').toLowerCase().includes('galafi')
+      getActualNote(t).toLowerCase().includes('galafi')
     );
     
     const djOngoingEmpty = djActive.filter(t => 
       getStat(t, 'ongoing') && 
       (t.destination || '').toLowerCase() === 'djibouti' && 
-      !(t.note || '').toLowerCase().includes('galafi')
+      !getActualNote(t).toLowerCase().includes('galafi')
     );
 
     const djOncomingEmpty = djActive.filter(t => 
       getStat(t, 'oncoming') && 
       (t.destination || '').toLowerCase() === 'djibouti' && 
-      !(t.note || '').toLowerCase().includes('galafi')
+      !getActualNote(t).toLowerCase().includes('galafi')
     );
 
     const djLoadingAtDj = djActive.filter(t => 
@@ -236,7 +263,7 @@ bot.onText(/\/all/, async (msg) => {
 
       if (djLoadingAtDj.length > 0) {
         report += `LOADING AT DJIBOUTI (${djLoadingAtDj.length})\n`;
-        djLoadingAtDj.forEach(t => report += `${t.plate_no}${formatNote(t.note)} (Arrived ${getStatusDay(t)})\n`);
+        djLoadingAtDj.forEach(t => report += `${t.plate_no}${formatNote(getActualNote(t))} (Arrived ${getStatusDay(t)})\n`);
         report += `=============================\n\n`;
       }
 
@@ -249,38 +276,50 @@ bot.onText(/\/all/, async (msg) => {
 
       report += `ONGOING EMPTY TRUCKS TO DJIBOUTI (${djOngoingEmpty.length})\n`;
       if (djOngoingEmpty.length > 0) {
-        djOngoingEmpty.forEach(t => report += `${t.plate_no} ==> ${t.current_location || '?'}${formatNote(t.note)}\n`);
+        djOngoingEmpty.forEach(t => report += `${t.plate_no} ==> ${t.current_location || '?'}${formatNote(getActualNote(t))}\n`);
       }
       report += `============================\n\n`;
 
+      if (djOncomingEmpty.length > 0) {
+        report += `ONCOMING EMPTY TRUCKS TO DJIBOUTI (${djOncomingEmpty.length})\n`;
+        djOncomingEmpty.forEach(t => report += `${t.plate_no} ==> ${t.current_location || '?'}${formatNote(getActualNote(t))}\n`);
+        report += `============================\n`;
+        report += `\n`;
+      }
+
       if (djOthers.length > 0) {
-        report += `FERTLIZER (${djOthers.length})\n`;
+        const djOthersByCargo = groupBy(djOthers, getCargoType);
+        
+        for (const [cargoType, cargoTrucks] of Object.entries(djOthersByCargo)) {
+          report += `${cargoType.toUpperCase()} (${cargoTrucks.length})\n`;
 
-        const djUnload = djOthers.filter(t => getStat(t, 'unloading'));
-        if (djUnload.length > 0) {
-          const grouped = groupBy(djUnload, 'current_location');
-          for (const [loc, trks] of Object.entries(grouped)) {
-            report += `UNLOADING @ ${loc !== 'Unknown' && loc ? loc : '?'}\n`;
-            trks.forEach(t => report += `${t.plate_no}  (Arrived ${getStatusDay(t)})\n`);
-            report += `\n`;
+          const djUnload = cargoTrucks.filter(t => getStat(t, 'unloading'));
+          if (djUnload.length > 0) {
+            const grouped = groupBy(djUnload, 'current_location');
+            for (const [loc, trks] of Object.entries(grouped)) {
+              report += `UNLOADING @ ${loc !== 'Unknown' && loc ? loc : '?'}\n`;
+              trks.forEach(t => report += `${t.plate_no}  (Arrived ${getStatusDay(t)})\n`);
+              report += `\n`;
+            }
           }
-        }
 
-        const djOngoing = djOthers.filter(t => getStat(t, 'ongoing'));
-        if (djOngoing.length > 0) {
-          const grouped = groupBy(djOngoing, 'destination');
-          for (const [dest, trks] of Object.entries(grouped)) {
-            report += `DJIBOUTI TO ${dest !== 'Unknown' ? dest : '?'}\n`;
-            trks.forEach(t => report += `${t.plate_no} ==> ${t.current_location || '?'}${formatNote(t.note)}\n`);
-            report += `\n`;
+          const djOngoing = cargoTrucks.filter(t => getStat(t, 'ongoing'));
+          if (djOngoing.length > 0) {
+            const grouped = groupBy(djOngoing, 'destination');
+            for (const [dest, trks] of Object.entries(grouped)) {
+              report += `DJIBOUTI TO ${dest !== 'Unknown' ? dest : '?'}\n`;
+              trks.forEach(t => report += `${t.plate_no} ==> ${t.current_location || '?'}${formatNote(getActualNote(t))}\n`);
+              report += `\n`;
+            }
           }
+          report += `============================\n\n`;
         }
-        report += `============================\n\n`;
       }
     }
 
     // --- BRANDS SECTION ---
-    const brands = ['Walia', 'BGI', 'Leshato', 'Habesha', 'Afer', 'Unilever'];
+    const dbBrands = [...new Set(trucks.map(t => t.category).filter(Boolean))].filter(c => c.toLowerCase() !== 'djibouti');
+    const brands = [...new Set(['Walia', 'BGI', 'Leshato', 'Habesha', 'Afer', 'Unilever', ...dbBrands])];
     brands.forEach(brand => {
       const brandTrucks = trucks.filter(t => getCat(t, brand));
       const activeBrandTrucks = brandTrucks.filter(isActiveTruck);
@@ -305,7 +344,7 @@ bot.onText(/\/all/, async (msg) => {
       const unloading = activeBrandTrucks.filter(t => getStat(t, 'unloading'));
       if (unloading.length > 0) {
         report += `UNLOADING\n`;
-        unloading.forEach(t => report += `${t.plate_no} ==> ${t.current_location || '?'}${formatNote(t.note)} (Arrived ${getStatusDay(t)})\n`);
+        unloading.forEach(t => report += `${t.plate_no} ==> ${t.current_location || '?'}${formatNote(getActualNote(t))} (Arrived ${getStatusDay(t)})\n`);
         report += `\n`;
       }
 
@@ -316,7 +355,7 @@ bot.onText(/\/all/, async (msg) => {
         const onByDest = groupBy(ongoing, 'destination');
         for (const [dest, trks] of Object.entries(onByDest)) {
           report += `to ${dest}\n`;
-          trks.forEach(t => report += `${t.plate_no} ==> ${t.current_location || '?'}${formatNote(t.note)}\n`);
+          trks.forEach(t => report += `${t.plate_no} ==> ${t.current_location || '?'}${formatNote(getActualNote(t))}\n`);
           report += `\n`;
         }
       }
@@ -328,7 +367,7 @@ bot.onText(/\/all/, async (msg) => {
         const onByFrom = groupBy(oncoming, 'from_location');
         for (const [fromLoc, trks] of Object.entries(onByFrom)) {
           report += `from ${fromLoc}\n`;
-          trks.forEach(t => report += `${t.plate_no} ==> ${t.current_location || '?'}${formatNote(t.note)}\n`);
+          trks.forEach(t => report += `${t.plate_no} ==> ${t.current_location || '?'}${formatNote(getActualNote(t))}\n`);
           report += `\n`;
         }
       }
@@ -342,7 +381,7 @@ bot.onText(/\/all/, async (msg) => {
     report += `PARKED (${parkedTrucks.length})\n`;
     if (parkedTrucks.length > 0) {
       parkedTrucks.forEach(t => {
-        const note = t.note ? ` ${t.note.trim()}` : '';
+        const note = getActualNote(t) ? ` ${getActualNote(t).trim()}` : '';
         report += `${t.plate_no} = (Arrived ${getStatusDay(t)})${note}\n`;
       });
     }
@@ -439,6 +478,33 @@ if (chatId && chatId !== 'your_telegram_chat_id_here') {
               bot.sendMessage(chatId, message, { parse_mode: 'Markdown' })
                 .catch(err => console.error("Error sending Telegram alert:", err));
           }
+        }
+      )
+      .on(
+        'postgres_changes',
+        {
+          event: 'INSERT',
+          schema: 'public',
+          table: 'trucks',
+        },
+        (payload) => {
+          const truckNumber = payload.new.plate_no;
+          const status = payload.new.status || 'Available';
+          const category = payload.new.category || 'N/A';
+          const location = payload.new.current_location || 'N/A';
+          
+          const statusEmoji = {
+            'Available': '✅',
+            'In Transit': '🚚',
+            'Maintenance': '🔧',
+            'Loading': '📦',
+            'Unloading': '📤'
+          }[status] || '📍';
+          
+          const message = `🆕 *New Vehicle Registered*\n\nTruck *${truckNumber}* joins the active fleet!\nCategory: *${category}*\nStatus: ${statusEmoji} *${status}*\nLocation: *${location}*`;
+          
+          bot.sendMessage(chatId, message, { parse_mode: 'Markdown' })
+            .catch(err => console.error("Error sending Telegram registration alert:", err));
         }
       )
       .subscribe((status) => {

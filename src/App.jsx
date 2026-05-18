@@ -8,6 +8,7 @@ import Dashboard from './pages/Dashboard';
 import Landing from './pages/Landing';
 import TrucksList from './pages/TrucksList';
 import TruckHistory from './pages/TruckHistory';
+import UserManagement from './pages/UserManagement';
 
 function App() {
   return (
@@ -25,7 +26,7 @@ function App() {
               
               {/* Admin Only Routes (Modals used for Add/Edit now) */}
               <Route element={<ProtectedRoute requireAdmin={true} />}>
-                {/* Future Admin Routes */}
+                <Route path="/users" element={<UserManagement />} />
               </Route>
             </Route>
           </Route>

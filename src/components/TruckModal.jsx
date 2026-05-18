@@ -22,6 +22,9 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
     note: ''
   });
 
+  const [cargoType, setCargoType] = useState('Fertilizer');
+  const [manualCargoType, setManualCargoType] = useState('');
+
   const fetchExistingCategories = async () => {
     try {
       const { data, error } = await supabase.from('trucks').select('category');
@@ -52,6 +55,8 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
           current_location: '',
           note: ''
         });
+        setCargoType('Fertilizer');
+        setManualCargoType('');
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -68,6 +73,22 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
         
       if (error) throw error;
       if (data) {
+        let initialCargoType = 'Fertilizer';
+        let initialManualCargoType = '';
+        let initialActualNote = data.note || '';
+
+        const match = (data.note || '').match(/^\[(.*?)\]/);
+        if (match) {
+          const extractedType = match[1].trim();
+          initialActualNote = (data.note || '').replace(/^\[.*?\]\s*/, '').trim();
+          if (extractedType === 'Fertilizer' || extractedType === "Merchant's cargo") {
+            initialCargoType = extractedType;
+          } else {
+            initialCargoType = 'Custom';
+            initialManualCargoType = extractedType;
+          }
+        }
+
         setFormData({
           plate_no: data.plate_no || '',
           category: data.category || '',
@@ -75,8 +96,10 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
           from_location: data.from_location || '',
           destination: data.destination || '',
           current_location: data.current_location || '',
-          note: data.note || ''
+          note: initialActualNote
         });
+        setCargoType(initialCargoType);
+        setManualCargoType(initialManualCargoType);
       }
     } catch (err) {
       console.error('Error fetching truck:', err);
@@ -101,16 +124,30 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
         throw new Error('Plate No and Status are required.');
       }
 
+      // Prepend cargo type if category is Djibouti
+      const isDjibouti = (formData.category || '').toLowerCase() === 'djibouti';
+      const finalCargoType = isDjibouti
+        ? (cargoType === 'Custom' ? manualCargoType.trim() : cargoType)
+        : null;
+      const finalNote = finalCargoType
+        ? `[${finalCargoType}] ${formData.note.trim()}`
+        : formData.note.trim();
+
+      const submitData = {
+        ...formData,
+        note: finalNote
+      };
+
       if (isEditing) {
         const { error } = await supabase
           .from('trucks')
-          .update(formData)
+          .update(submitData)
           .eq('plate_no', plateNo);
         if (error) throw error;
       } else {
         const { error } = await supabase
           .from('trucks')
-          .insert([formData]);
+          .insert([submitData]);
         if (error) {
           if (error.code === '23505') throw new Error('A truck with this plate number already exists.');
           throw error;
@@ -279,6 +316,42 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
                   />
                 </div>
               </div>
+              
+              {/* Cargo Type (Specific to Djibouti category) */}
+              {(formData.category || '').toLowerCase() === 'djibouti' && (
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-5 bg-orange-500/5 dark:bg-orange-500/10 rounded-2xl border border-orange-500/20 dark:border-orange-500/30">
+                  <div className="space-y-1.5">
+                    <label className="block text-xs font-bold uppercase tracking-widest text-orange-500 dark:text-orange-400">
+                      Djibouti Cargo Type
+                    </label>
+                    <select
+                      value={cargoType}
+                      onChange={(e) => setCargoType(e.target.value)}
+                      className="w-full px-4 py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-bold shadow-inner outline-none text-slate-900 dark:text-white"
+                    >
+                      <option value="Fertilizer">Fertilizer</option>
+                      <option value="Merchant's cargo">Merchant's cargo</option>
+                      <option value="Custom">Custom / Manual...</option>
+                    </select>
+                  </div>
+
+                  {cargoType === 'Custom' && (
+                    <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                      <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                        Specify Cargo Type
+                      </label>
+                      <input
+                        type="text"
+                        value={manualCargoType}
+                        onChange={(e) => setManualCargoType(e.target.value)}
+                        placeholder="Type cargo name manually..."
+                        required
+                        className="w-full px-4 py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-bold shadow-inner outline-none text-slate-900 dark:text-white"
+                      />
+                    </div>
+                  )}
+                </div>
+              )}
 
               {/* Note */}
               <div className="space-y-1.5">

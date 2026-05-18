@@ -267,8 +267,17 @@ export default function TruckHistory() {
                         </div>
                       )}
                     </td>
-                    <td className="p-4 text-sm text-slate-500 dark:text-slate-400 max-w-xs truncate" title={record.note}>
-                      {record.note || '—'}
+                    <td className="p-4 text-sm max-w-xs truncate" title={record.note}>
+                      <div className="flex flex-col">
+                        <span className="text-slate-700 dark:text-slate-300 font-medium">
+                          {record.note ? record.note.replace(/^\[.*?\]\s*/, '') : '—'}
+                        </span>
+                        {record.note && record.note.startsWith('[') && (
+                          <span className="inline-flex self-start mt-1 px-1.5 py-0.5 rounded-lg text-[9px] font-black uppercase bg-orange-500/10 text-orange-500 border border-orange-500/25 tracking-wider">
+                            {record.note.match(/^\[(.*?)\]/)?.[1]}
+                          </span>
+                        )}
+                      </div>
                     </td>
                     <td className="p-4 text-sm whitespace-nowrap text-slate-600 dark:text-slate-300 font-medium">
                       {formatDate(record.changed_at)}
