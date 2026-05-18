@@ -120,40 +120,38 @@ export default function Dashboard() {
     <div className="space-y-10 pb-12 animate-fade-in-up">
       
       {/* HEADER HERO SECTION */}
-      <div className="relative w-full rounded-[2rem] overflow-hidden bg-slate-900 border border-slate-700 shadow-2xl group">
+      <div className="relative w-full rounded-[1.5rem] sm:rounded-[2rem] overflow-hidden bg-slate-900 border border-slate-700 shadow-2xl group">
         
         {/* Animated Background Gradients */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <div className="absolute -top-[20%] -right-[10%] w-[50%] h-[150%] bg-gradient-to-l from-orange-500/20 to-transparent blur-3xl opacity-50 group-hover:opacity-70 transition-opacity duration-1000 animate-pulse-slow"></div>
-          <div className="absolute bottom-[10%] -left-[10%] w-[40%] h-[120%] bg-gradient-to-r from-blue-500/10 to-transparent blur-3xl opacity-50 group-hover:opacity-70 transition-opacity duration-1000"></div>
-          
-          {/* Subtle grid pattern overlay */}
+          <div className="absolute bottom-[10%] -left-[10%] w-[40%] h-[120%] bg-gradient-to-r from-blue-500/10 to-transparent blur-3xl opacity-50"></div>
           <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjAiIGhlaWdodD0iMjAiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+PGNpcmNsZSBjeD0iMSIgY3k9IjEiIHI9IjEiIGZpbGw9InJnYmEoMjU1LCUyNTUsJTI1NSwtMC4wNSkiLz48L3N2Zz4=')] opacity-20"></div>
         </div>
         
-        <div className="relative z-10 p-10 sm:p-14 flex flex-col sm:flex-row items-center justify-between gap-8">
+        <div className="relative z-10 p-6 sm:p-10 sm:p-14 flex flex-col sm:flex-row items-center justify-between gap-5 sm:gap-8">
           
-          <div className="space-y-4 text-center sm:text-left">
+          <div className="space-y-2 sm:space-y-4 text-center sm:text-left w-full sm:w-auto">
             <div className="inline-flex items-center space-x-2 px-3 py-1 bg-white/5 border border-white/10 rounded-full backdrop-blur-md">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
               <span className="text-xs font-semibold tracking-wider text-slate-300 uppercase">Live Systems Online</span>
             </div>
             
-            <h2 className="text-4xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
+            <h2 className="text-3xl sm:text-5xl lg:text-6xl font-black text-white tracking-tight leading-tight">
               Command <span className="text-transparent bg-clip-text bg-gradient-to-r from-orange-400 via-orange-500 to-amber-500">Center</span>
             </h2>
             
-            <p className="text-slate-400 text-lg sm:text-xl font-medium max-w-lg">
+            <p className="text-slate-400 text-base sm:text-xl font-medium max-w-lg">
               Monitor, track, and manage your entire logistics network in real-time.
             </p>
           </div>
 
-          {/* Epic Number Display */}
-          <div className="relative group-hover:scale-105 transition-transform duration-500">
+          {/* Fleet Size Badge */}
+          <div className="relative group-hover:scale-105 transition-transform duration-500 shrink-0">
             <div className="absolute inset-0 bg-orange-500/20 blur-2xl rounded-full"></div>
-            <div className="relative glass-card bg-slate-800/50 rounded-3xl p-8 flex flex-col items-center justify-center min-w-[200px] border-slate-600/50">
-              <span className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">Total Fleet Size</span>
-              <span className="text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400 drop-shadow-lg leading-none">
+            <div className="relative glass-card bg-slate-800/50 rounded-2xl sm:rounded-3xl p-5 sm:p-8 flex flex-col items-center justify-center min-w-[140px] sm:min-w-[200px] border-slate-600/50">
+              <span className="text-xs font-bold uppercase tracking-widest text-slate-400 mb-1 sm:mb-2">Total Fleet</span>
+              <span className="text-5xl sm:text-7xl font-black text-transparent bg-clip-text bg-gradient-to-br from-white to-slate-400 drop-shadow-lg leading-none">
                 {trucks.length}
               </span>
             </div>

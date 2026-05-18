@@ -9,6 +9,7 @@ import Landing from './pages/Landing';
 import TrucksList from './pages/TrucksList';
 import TruckHistory from './pages/TruckHistory';
 import UserManagement from './pages/UserManagement';
+import LiveMapPage from './pages/LiveMapPage';
 
 function App() {
   return (
@@ -22,6 +23,7 @@ function App() {
               {/* Authenticated Routes */}
               <Route path="/dashboard" element={<Dashboard />} />
               <Route path="/trucks" element={<TrucksList />} />
+              <Route path="/map" element={<LiveMapPage />} />
               <Route path="/trucks/history/:plateNo" element={<TruckHistory />} />
               
               {/* Admin Only Routes (Modals used for Add/Edit now) */}

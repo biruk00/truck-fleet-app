@@ -629,146 +629,197 @@ export default function TrucksList() {
   };
 
   return (
-    <div className="bg-white dark:bg-slate-800 shadow-xl rounded-2xl border border-slate-200 dark:border-slate-700 overflow-hidden transition-colors">
+    <div className="bg-[#0B1120] sm:bg-white sm:dark:bg-slate-800 shadow-none sm:shadow-xl rounded-none sm:rounded-2xl border-0 sm:border border-slate-200 dark:border-slate-700 overflow-hidden transition-colors">
       
-      {/* HEADER / TOOLBAR */}
-      <div className="p-6 border-b border-slate-200 dark:border-slate-700 bg-slate-50/50 dark:bg-slate-900/50">
-        <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+      {/* ═══ HEADER / TOOLBAR ═══ */}
+      <div className="p-4 sm:p-6 border-b border-white/5 sm:border-slate-200 dark:border-slate-700 bg-transparent sm:bg-slate-50/50 dark:bg-slate-900/50">
+
+        {/* Title Row */}
+        <div className="flex items-center justify-between mb-4">
           <div>
-            <h2 className="text-2xl font-bold tracking-tight text-slate-800 dark:text-white">Fleet Inventory</h2>
-            <p className="text-sm text-slate-500 dark:text-slate-400 mt-1">Manage and track all {trucks.length} vehicles</p>
+            <h2 className="text-xl sm:text-2xl font-black tracking-tight text-white sm:text-slate-800 dark:text-white">Fleet Inventory</h2>
+            <p className="text-xs text-slate-500 mt-0.5">Tracking {trucks.length} vehicles</p>
           </div>
-          <div className="flex gap-2 flex-wrap sm:flex-nowrap">
-            
-            {/* SUMMARY BUTTON */}
-            <button 
+
+          {/* MOBILE: icon-only action pills */}
+          <div className="flex sm:hidden items-center gap-2">
+            <button
               onClick={exportToSummaryReport}
-              className="inline-flex items-center px-4 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 dark:hover:bg-emerald-800/50 text-sm font-medium rounded-xl shadow-sm transition-all"
+              className="flex items-center gap-1.5 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-emerald-400 text-xs font-bold rounded-xl transition-all"
+              title="Copy Summary"
             >
-              <FileText className="h-4 w-4 mr-2" />
-              Copy Summary
+              <FileText className="h-4 w-4" />
+              <span>Sum</span>
             </button>
-
-            {/* FULL REPORT BUTTON */}
-            <button 
+            <button
               onClick={exportToTextReport}
-              className="inline-flex items-center px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 dark:hover:bg-indigo-800/50 text-sm font-medium rounded-xl shadow-sm transition-all"
+              className="flex items-center gap-1.5 px-3 py-2 bg-white/5 hover:bg-white/10 border border-white/10 text-indigo-400 text-xs font-bold rounded-xl transition-all"
+              title="Full Report"
             >
-              <Activity className="h-4 w-4 mr-2" />
-              Copy Full
+              <Activity className="h-4 w-4" />
+              <span>Full</span>
             </button>
-
-            <button 
+            <button
               onClick={exportToCSV}
-              className="inline-flex items-center px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-200 dark:hover:bg-slate-700 text-sm font-medium rounded-xl shadow-sm transition-all"
+              className="p-2 bg-white/5 hover:bg-white/10 border border-white/10 text-slate-400 rounded-xl transition-all"
+              title="Export CSV"
             >
-              <Download className="h-4 w-4 mr-2" />
-              CSV
+              <Download className="h-4 w-4" />
             </button>
-            
+          </div>
+
+          {/* DESKTOP: full buttons */}
+          <div className="hidden sm:flex gap-2 flex-wrap">
+            <button onClick={exportToSummaryReport} className="inline-flex items-center px-4 py-2 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 border border-emerald-200 dark:border-emerald-800 hover:bg-emerald-100 text-sm font-medium rounded-xl shadow-sm transition-all">
+              <FileText className="h-4 w-4 mr-2" /> Copy Summary
+            </button>
+            <button onClick={exportToTextReport} className="inline-flex items-center px-4 py-2 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-600 dark:text-indigo-400 border border-indigo-200 dark:border-indigo-800 hover:bg-indigo-100 text-sm font-medium rounded-xl shadow-sm transition-all">
+              <Activity className="h-4 w-4 mr-2" /> Copy Full
+            </button>
+            <button onClick={exportToCSV} className="inline-flex items-center px-4 py-2 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-300 border border-slate-300 dark:border-slate-600 hover:bg-slate-200 text-sm font-medium rounded-xl shadow-sm transition-all">
+              <Download className="h-4 w-4 mr-2" /> CSV
+            </button>
             {isAdmin && (
-              <button 
-                onClick={handleAdd}
-                className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-sm font-medium rounded-xl shadow-md transition-all hover:-translate-y-0.5"
-              >
-                <Plus className="h-4 w-4 mr-1 sm:mr-2" />
-                <span className="hidden sm:inline">Add Truck</span>
-                <span className="sm:hidden">Add</span>
+              <button onClick={handleAdd} className="inline-flex items-center px-4 py-2 bg-gradient-to-r from-orange-500 to-orange-600 hover:from-orange-600 hover:to-orange-700 text-white text-sm font-medium rounded-xl shadow-md transition-all hover:-translate-y-0.5">
+                <Plus className="h-4 w-4 mr-2" /> Add Truck
               </button>
             )}
           </div>
         </div>
 
-        {/* CHIPS (Categories) */}
+        {/* ── CATEGORY CHIPS ── */}
         {!loading && trucks.length > 0 && (
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-3 md:grid-cols-6 gap-3 lg:gap-4 px-6">
-            {chipDefs.map(c => {
-              const isActive = (categoryFilter === c.key) || (categoryFilter === '' && c.key === 'all');
-              return (
-                <div
-                  key={c.key}
-                  onClick={() => handleChipClick(c.key)}
-                  className={`
-                    relative bg-white dark:bg-slate-800 rounded-xl p-3 border-l-4 shadow-sm hover:shadow-md cursor-pointer
-                    transition-all duration-300 overflow-hidden
-                    ${isActive ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20' : 'border-slate-300 dark:border-slate-600'}
-                  `}
-                >
-                  <div className="flex flex-col justify-center items-center text-center">
-                    <span className={`text-xl font-black ${c.key === 'all' ? 'text-orange-500' : 'text-slate-700 dark:text-slate-200'}`}>
-                      {c.count}
-                    </span>
-                    <span className="text-[10px] sm:text-xs font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mt-1">
-                      {c.label}
-                    </span>
+          <>
+            {/* Mobile: horizontal scrolling pill selector */}
+            <div className="flex sm:hidden overflow-x-auto gap-2 pb-1 -mx-1 px-1 scrollbar-none mt-1">
+              {chipDefs.map(c => {
+                const isActive = (categoryFilter === c.key) || (categoryFilter === '' && c.key === 'all');
+                return (
+                  <button
+                    key={c.key}
+                    onClick={() => handleChipClick(c.key)}
+                    className={`shrink-0 flex items-center gap-1.5 px-3.5 py-2 rounded-full text-xs font-black uppercase tracking-wider transition-all ${
+                      isActive
+                        ? 'bg-orange-500 text-white shadow-lg shadow-orange-500/30'
+                        : 'bg-white/5 text-slate-400 border border-white/10 hover:bg-white/10'
+                    }`}
+                  >
+                    <span className={`text-sm font-black ${isActive ? 'text-white' : 'text-slate-300'}`}>{c.count}</span>
+                    {c.label}
+                  </button>
+                );
+              })}
+            </div>
+
+            {/* Desktop: grid chips */}
+            <div className="hidden sm:grid grid-cols-3 md:grid-cols-6 gap-3 lg:gap-4 px-6 mt-6">
+              {chipDefs.map(c => {
+                const isActive = (categoryFilter === c.key) || (categoryFilter === '' && c.key === 'all');
+                return (
+                  <div
+                    key={c.key}
+                    onClick={() => handleChipClick(c.key)}
+                    className={`relative bg-white dark:bg-slate-800 rounded-xl p-3 border-l-4 shadow-sm hover:shadow-md cursor-pointer transition-all duration-300 ${
+                      isActive ? 'border-orange-500 bg-orange-50 dark:bg-orange-900/20' : 'border-slate-300 dark:border-slate-600'
+                    }`}
+                  >
+                    <div className="flex flex-col justify-center items-center text-center">
+                      <span className={`text-xl font-black ${c.key === 'all' ? 'text-orange-500' : 'text-slate-700 dark:text-slate-200'}`}>{c.count}</span>
+                      <span className="text-[10px] font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400 mt-1">{c.label}</span>
+                    </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+          </>
         )}
 
-        {/* STATUS SUMMARY (Interactive) */}
+        {/* ── STATUS CARDS ── */}
         {!loading && trucks.length > 0 && (
-          <div className="mt-4 px-6 grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4">
-            {Object.keys(STATUS_ICONS).map(status => {
-              const count = statusCounts[status] || 0;
-              const isActive = statusFilter === status;
-              return (
-                <div
-                  key={status}
-                  onClick={() => setStatusFilter(isActive ? '' : status)}
-                  className={`
-                    bg-white dark:bg-slate-800 p-3 lg:p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all
-                    ${isActive 
-                      ? 'border-orange-500 ring-1 ring-orange-500 shadow-md' 
-                      : 'border-slate-200 dark:border-slate-700 hover:border-slate-300 dark:hover:border-slate-600'}
-                  `}
-                >
-                  <div className="flex items-center space-x-3">
-                    <div className="p-2 sm:p-2.5 bg-slate-50 dark:bg-slate-900 rounded-lg">
+          <>
+            {/* Mobile: 2-col compact dark cards */}
+            <div className="grid grid-cols-2 sm:hidden gap-2 mt-3">
+              {Object.keys(STATUS_ICONS).map(status => {
+                const count = statusCounts[status] || 0;
+                const isActive = statusFilter === status;
+                return (
+                  <div
+                    key={status}
+                    onClick={() => setStatusFilter(isActive ? '' : status)}
+                    className={`flex items-center gap-3 px-3 py-3 rounded-2xl border cursor-pointer transition-all ${
+                      isActive
+                        ? 'bg-orange-500/15 border-orange-500/50 shadow-md shadow-orange-500/10'
+                        : 'bg-white/4 border-white/8 hover:bg-white/8'
+                    }`}
+                  >
+                    <div className={`p-2 rounded-xl shrink-0 ${isActive ? 'bg-orange-500/20' : 'bg-white/5'}`}>
                       {STATUS_ICONS[status]}
                     </div>
                     <div>
-                      <p className="text-[11px] sm:text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{status}</p>
-                      <p className={`text-xl sm:text-2xl font-black ${STATUS_COLORS[status]}`}>{count}</p>
+                      <p className={`text-[10px] font-bold uppercase tracking-wider ${isActive ? 'text-orange-400' : 'text-slate-500'}`}>{status}</p>
+                      <p className={`text-xl font-black ${STATUS_COLORS[status]}`}>{count}</p>
                     </div>
                   </div>
-                </div>
-              );
-            })}
-          </div>
+                );
+              })}
+            </div>
+
+            {/* Desktop: original cards */}
+            <div className="hidden sm:grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 gap-3 lg:gap-4 mt-4 px-6">
+              {Object.keys(STATUS_ICONS).map(status => {
+                const count = statusCounts[status] || 0;
+                const isActive = statusFilter === status;
+                return (
+                  <div
+                    key={status}
+                    onClick={() => setStatusFilter(isActive ? '' : status)}
+                    className={`bg-white dark:bg-slate-800 p-3 lg:p-4 rounded-xl border flex items-center justify-between cursor-pointer transition-all ${
+                      isActive
+                        ? 'border-orange-500 ring-1 ring-orange-500 shadow-md'
+                        : 'border-slate-200 dark:border-slate-700 hover:border-slate-300'
+                    }`}
+                  >
+                    <div className="flex items-center space-x-3">
+                      <div className="p-2 sm:p-2.5 bg-slate-50 dark:bg-slate-900 rounded-lg">{STATUS_ICONS[status]}</div>
+                      <div>
+                        <p className="text-[11px] sm:text-sm font-semibold uppercase tracking-wider text-slate-500 dark:text-slate-400">{status}</p>
+                        <p className={`text-xl sm:text-2xl font-black ${STATUS_COLORS[status]}`}>{count}</p>
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
+            </div>
+          </>
         )}
 
-        {/* FILTERS */}
-        <div className="mt-6 flex flex-col md:flex-row gap-4">
+        {/* ── SEARCH & FILTERS ── */}
+        <div className="mt-4 flex flex-col sm:flex-row gap-3">
           <div className="relative flex-1">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-5 w-5 text-slate-400" />
-            <input 
-              type="text" 
-              placeholder="Search plate matches, location..." 
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-slate-400" />
+            <input
+              type="text"
+              placeholder="Search plate, location..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-10 pr-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-orange-500 focus:border-orange-500 transition-all text-sm outline-none"
+              className="w-full pl-10 pr-4 py-2.5 bg-white/5 sm:bg-white dark:bg-slate-900 border border-white/10 sm:border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-orange-500 text-sm outline-none text-white sm:text-slate-900 dark:text-white placeholder-slate-500"
             />
           </div>
-          
-          <div className="flex gap-2 min-w-max">
-            <select 
-              value={categoryFilter} 
+          <div className="flex gap-2">
+            <select
+              value={categoryFilter}
               onChange={(e) => setCategoryFilter(e.target.value)}
-              className="px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-orange-500 transition-all text-sm outline-none text-slate-700 dark:text-slate-300 font-medium"
+              className="flex-1 sm:flex-none px-3 py-2.5 bg-white/5 sm:bg-white dark:bg-slate-900 border border-white/10 sm:border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-orange-500 text-sm outline-none text-slate-300 sm:text-slate-700 dark:text-slate-300 font-medium"
             >
-              <option value="">All Categories</option>
+              <option value="">All Cats.</option>
               {categories.map(c => <option key={c} value={c}>{c}</option>)}
             </select>
-            
-            <select 
-              value={statusFilter} 
+            <select
+              value={statusFilter}
               onChange={(e) => setStatusFilter(e.target.value)}
-              className="px-4 py-2.5 bg-white dark:bg-slate-900 border border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-orange-500 transition-all text-sm outline-none text-slate-700 dark:text-slate-300 font-medium"
+              className="flex-1 sm:flex-none px-3 py-2.5 bg-white/5 sm:bg-white dark:bg-slate-900 border border-white/10 sm:border-slate-300 dark:border-slate-600 rounded-xl focus:ring-2 focus:ring-orange-500 text-sm outline-none text-slate-300 sm:text-slate-700 dark:text-slate-300 font-medium"
             >
-              <option value="">All Statuses</option>
+              <option value="">All Status</option>
               {statuses.map(s => <option key={s} value={s}>{s}</option>)}
             </select>
           </div>
@@ -776,7 +827,90 @@ export default function TrucksList() {
       </div>
 
       {/* TABLE */}
-      <div className="overflow-x-auto">
+      {/* ── MOBILE CARD VIEW (phones) ── */}
+      <div className="block sm:hidden divide-y divide-slate-200 dark:divide-slate-700/50">
+        {loading ? (
+          <div className="p-8 text-center text-slate-500">
+            <div className="flex justify-center mb-2"><Loader className="h-6 w-6 animate-spin text-orange-500" /></div>
+            Loading trucks...
+          </div>
+        ) : currentTrucks.length === 0 ? (
+          <div className="p-8 text-center text-slate-500">No trucks found matching your criteria.</div>
+        ) : (
+          currentTrucks.map(truck => (
+            <div key={truck.id} className="p-4 bg-white dark:bg-slate-800 hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors">
+              {/* Card Header: Plate + Status */}
+              <div className="flex items-center justify-between mb-3">
+                <span className="text-base font-black text-slate-900 dark:text-white tracking-tight">
+                  {truck.plate_no}
+                </span>
+                <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold border ${getStatusColor(truck.status)}`}>
+                  {truck.status || '—'}
+                </span>
+              </div>
+
+              {/* Card Body: Category + Route */}
+              <div className="flex flex-col gap-1.5 mb-4">
+                {truck.category && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 w-16 shrink-0">Category</span>
+                    <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">{truck.category}</span>
+                  </div>
+                )}
+                {truck.current_location && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 w-16 shrink-0">Location</span>
+                    <span className="text-sm font-semibold text-slate-600 dark:text-slate-300">{truck.current_location}</span>
+                  </div>
+                )}
+                {(truck.from_location || truck.destination) && (
+                  <div className="flex items-center gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 w-16 shrink-0">Route</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400">
+                      {truck.from_location || '?'} → {truck.destination || '?'}
+                    </span>
+                  </div>
+                )}
+                {truck.note && (
+                  <div className="flex items-start gap-2">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 w-16 shrink-0 pt-0.5">Note</span>
+                    <span className="text-xs text-slate-500 dark:text-slate-400 line-clamp-2">{truck.note}</span>
+                  </div>
+                )}
+              </div>
+
+              {/* Card Footer: Actions */}
+              <div className="flex items-center gap-2 pt-3 border-t border-slate-100 dark:border-slate-700">
+                <Link
+                  to={`/trucks/history/${encodeURIComponent(truck.plate_no)}`}
+                  className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-900/20 rounded-xl hover:bg-indigo-100 transition-colors"
+                >
+                  <History className="h-3.5 w-3.5" /> History
+                </Link>
+                {isAdmin && (
+                  <>
+                    <button
+                      onClick={() => handleEdit(truck.plate_no)}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-blue-600 dark:text-blue-400 bg-blue-50 dark:bg-blue-900/20 rounded-xl hover:bg-blue-100 transition-colors"
+                    >
+                      <Edit2 className="h-3.5 w-3.5" /> Edit
+                    </button>
+                    <button
+                      onClick={() => handleDelete(truck.id, truck.plate_no)}
+                      className="flex-1 flex items-center justify-center gap-1.5 py-2 text-xs font-bold text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20 rounded-xl hover:bg-red-100 transition-colors"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" /> Delete
+                    </button>
+                  </>
+                )}
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* ── DESKTOP TABLE VIEW ── */}
+      <div className="hidden sm:block overflow-x-auto">
         <table className="w-full text-left border-collapse">
           <thead>
             <tr className="bg-slate-100 dark:bg-slate-800/80 text-slate-600 dark:text-slate-400 text-sm font-semibold uppercase tracking-wider">
@@ -804,12 +938,8 @@ export default function TrucksList() {
             ) : (
               currentTrucks.map(truck => (
                 <tr key={truck.id} className="hover:bg-slate-50 dark:hover:bg-slate-700/30 transition-colors group">
-                  <td className="p-4 text-slate-900 dark:text-slate-200 font-medium">
-                    {truck.plate_no}
-                  </td>
-                  <td className="p-4 text-slate-600 dark:text-slate-400 text-sm">
-                    {truck.category || '—'}
-                  </td>
+                  <td className="p-4 text-slate-900 dark:text-slate-200 font-medium">{truck.plate_no}</td>
+                  <td className="p-4 text-slate-600 dark:text-slate-400 text-sm">{truck.category || '—'}</td>
                   <td className="p-4">
                     <span className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium border ${getStatusColor(truck.status)}`}>
                       {truck.status || '—'}
@@ -817,22 +947,19 @@ export default function TrucksList() {
                   </td>
                   <td className="p-4 text-sm">
                     <div className="flex flex-col">
-                      <span className="text-slate-900 dark:text-slate-300 font-medium">
-                        {truck.current_location || '—'}
-                      </span>
-                      {truck.from_location || truck.destination ? (
+                      <span className="text-slate-900 dark:text-slate-300 font-medium">{truck.current_location || '—'}</span>
+                      {(truck.from_location || truck.destination) && (
                         <span className="text-slate-500 dark:text-slate-500 text-xs mt-0.5">
                           {truck.from_location || '?'} &rarr; {truck.destination || '?'}
                         </span>
-                      ) : null}
+                      )}
                     </div>
                   </td>
                   <td className="p-4 text-center">
-                    <div className="flex items-center justify-center space-x-2 opacity-100 sm:opacity-50 group-hover:opacity-100 transition-opacity">
+                    <div className="flex items-center justify-center space-x-2 opacity-50 group-hover:opacity-100 transition-opacity">
                       <Link to={`/trucks/history/${encodeURIComponent(truck.plate_no)}`} className="p-2 text-indigo-500 hover:bg-indigo-50 dark:hover:bg-indigo-900/30 rounded-lg transition-colors" title="History">
                         <History className="h-4 w-4" />
                       </Link>
-                      
                       {isAdmin && (
                         <>
                           <button onClick={() => handleEdit(truck.plate_no)} className="p-2 text-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/30 rounded-lg transition-colors" title="Edit">

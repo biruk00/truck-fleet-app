@@ -1,0 +1,731 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GS Trading PLC | The Complete Cinematic Journey</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600;700;800;900&display=swap" rel="stylesheet">
+    <!-- GSAP for Animations -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.2/gsap.min.js"></script>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #000;
+            margin: 0;
+            overflow: hidden;
+            color: white;
+        }
+        .text-gs-blue { color: #2B509A; }
+        .text-gs-orange { color: #F47321; }
+        
+        #smooth-wrapper {
+            height: 100vh;
+            width: 100%;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100vh;
+            overflow: hidden;
+            opacity: 0;
+            visibility: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slide.active {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .slide-bg {
+            position: absolute;
+            top: -5%;
+            left: -5%;
+            width: 110%;
+            height: 110%;
+            background-size: cover;
+            background-position: center;
+            z-index: 1;
+            filter: brightness(0.7) contrast(1.1);
+        }
+
+        .overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(to top, rgba(0,0,0,0.85) 0%, transparent 40%);
+            z-index: 2;
+        }
+
+        .content-wrap {
+            position: absolute;
+            bottom: 60px;
+            left: 60px;
+            z-index: 10;
+            max-width: 600px;
+            text-align: left;
+            perspective: 1000px;
+        }
+
+        h2 {
+            font-size: 3rem !important;
+            line-height: 1;
+            text-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            margin-bottom: 10px;
+        }
+
+        .content-wrap p {
+            font-size: 0.85rem !important;
+            letter-spacing: 0.4em !important;
+            margin-top: 0;
+            opacity: 0.8;
+        }
+
+        #intro {
+            position: fixed;
+            inset: 0;
+            z-index: 2000;
+            background: radial-gradient(circle at center, #1a1a1a 0%, #000 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            flex-direction: column;
+        }
+
+        .logo-part {
+            position: absolute;
+            transform-origin: center;
+        }
+
+        .line-beam {
+            position: absolute;
+            width: 2px;
+            height: 100px;
+            background: linear-gradient(to top, transparent, #2B509A, #F47321, transparent);
+            opacity: 0;
+        }
+
+        .intro-title {
+            font-size: 4rem;
+            font-weight: 900;
+            background: linear-gradient(to bottom, #fff 0%, #aaa 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            filter: drop-shadow(0 0 20px rgba(43, 80, 154, 0.5));
+            letter-spacing: -0.05em;
+            margin-top: 40px;
+        }
+
+        .intro-sub {
+            font-weight: 400;
+            letter-spacing: 0.5em;
+            color: rgba(255,255,255,0.5);
+            margin-top: 10px;
+        }
+
+        .reflection {
+            position: absolute;
+            bottom: 20%;
+            width: 100%;
+            height: 100px;
+            background: linear-gradient(to top, rgba(43, 80, 154, 0.2), transparent);
+            filter: blur(20px);
+            opacity: 0;
+        }
+
+        .nav-dots {
+            position: fixed;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            max-height: 95vh;
+            padding-right: 5px;
+        }
+
+        .dot {
+            width: 4px;
+            height: 4px;
+            border: 1px solid rgba(255,255,255,0.2);
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+
+        .dot.active {
+            background: #F47321;
+            border-color: #F47321;
+            transform: scale(1.5);
+        }
+
+        .slide-num {
+            position: absolute;
+            bottom: 30px;
+            left: 30px;
+            font-size: 40px;
+            font-weight: 900;
+            opacity: 0; /* Hidden for clean recording */
+            line-height: 1;
+            z-index: 5;
+            transition: opacity 0.5s;
+        }
+
+        .category-tag {
+            position: absolute;
+            top: 30px;
+            left: 30px;
+            font-size: 10px;
+            font-weight: 900;
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            color: rgba(255,255,255,0.3);
+            z-index: 5;
+            opacity: 0; /* Hidden for clean recording */
+            transition: opacity 0.5s;
+        }
+
+        /* Auto-Play Button Styling */
+        .controls {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            opacity: 0; /* Hidden for clean recording */
+            transition: opacity 0.5s;
+        }
+
+        .autoplay-btn {
+            background: rgba(255,255,255,0.1);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255,255,255,0.2);
+            padding: 10px 20px;
+            border-radius: 50px;
+            font-size: 12px;
+            font-weight: 800;
+            letter-spacing: 0.2em;
+            cursor: pointer;
+            transition: all 0.4s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .autoplay-btn.active {
+            background: #F47321;
+            border-color: #F47321;
+            color: #000;
+        }
+
+        .progress-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            height: 3px;
+            background: #F47321;
+            width: 0%;
+            z-index: 1001;
+            transition: width 0.1s linear;
+        }
+
+        #glitch-overlay {
+            position: fixed;
+            inset: 0;
+            z-index: 1500;
+            pointer-events: none;
+            background: rgba(43, 80, 154, 0.1);
+            mix-blend-mode: color-dodge;
+            opacity: 0;
+        }
+
+        #flash {
+            position: fixed;
+            inset: 0;
+            background: #fff;
+            opacity: 0;
+            z-index: 1500;
+            pointer-events: none;
+        }
+
+        .glitch-slice {
+            position: absolute;
+            width: 100%;
+            height: 10px;
+            background: rgba(244, 115, 33, 0.3);
+            opacity: 0;
+        }
+
+        .watermark {
+            position: absolute;
+            top: 30px;
+            right: 30px;
+            width: 60px;
+            height: 60px;
+            z-index: 100;
+            opacity: 0.8;
+            filter: drop-shadow(0 0 20px rgba(244, 115, 33, 0.4));
+            animation: breathe 4s infinite ease-in-out;
+        }
+
+        @keyframes breathe {
+            0%, 100% { transform: scale(1) rotate(0deg); opacity: 0.6; }
+            50% { transform: scale(1.15) rotate(5deg); opacity: 1; }
+        }
+
+        #particles-js {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 3;
+            pointer-events: none;
+        }
+
+        /* GPS UI Elements */
+        .gps-grid {
+            position: absolute;
+            inset: 0;
+            z-index: 5;
+            background-image: linear-gradient(rgba(43, 80, 154, 0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(43, 80, 154, 0.1) 1px, transparent 1px);
+            background-size: 50px 50px;
+            opacity: 0;
+        }
+
+        .truck-marker {
+            position: absolute;
+            width: 30px;
+            height: 30px;
+            z-index: 6;
+            opacity: 0;
+        }
+
+        .marker-pulse {
+            position: absolute;
+            inset: -8px;
+            border: 1px solid #F47321;
+            border-radius: 50%;
+            animation: pulse 2s infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: scale(0.5); opacity: 1; }
+            100% { transform: scale(2); opacity: 0; }
+        }
+
+        .marker-label {
+            position: absolute;
+            top: -35px;
+            left: 50%;
+            transform: translateX(-50%);
+            background: rgba(0,0,0,0.8);
+            border: 1px solid #F47321;
+            padding: 2px 8px;
+            border-radius: 2px;
+            font-size: 8px;
+            white-space: nowrap;
+            color: #fff;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- Cinematic Intro -->
+    <div id="intro">
+        <div class="relative w-64 h-64 flex items-center justify-center">
+            <!-- Orange Arc -->
+            <svg id="arc-orange" class="logo-part w-48 h-48 opacity-0" viewBox="0 0 100 100">
+                <path d="M50 50 L20 10 A45 45 0 0 0 50 90 Z" fill="#F47321" />
+            </svg>
+            <!-- Blue Arc -->
+            <svg id="arc-blue" class="logo-part w-48 h-48 opacity-0" viewBox="0 0 100 100">
+                <path d="M50 50 L80 90 A45 45 0 0 0 50 10 Z" fill="#2B509A" />
+            </svg>
+            <!-- Beams -->
+            <div class="line-beam" style="transform: rotate(0deg) translateY(-80px)"></div>
+            <div class="line-beam" style="transform: rotate(30deg) translateY(-80px)"></div>
+            <div class="line-beam" style="transform: rotate(-30deg) translateY(-80px)"></div>
+        </div>
+        
+        <div class="text-center relative">
+            <h1 id="intro-txt" class="intro-title opacity-0">GS <span class="text-gs-blue">Trading</span> PLC</h1>
+            <p id="intro-sub" class="intro-sub opacity-0">Reliable. <span class="text-gs-orange">Global.</span> Ahead.</p>
+        </div>
+
+        <div class="reflection" id="intro-refl"></div>
+    </div>
+
+    <!-- Scroll Dots -->
+    <div class="nav-dots" id="dot-container"></div>
+
+    <!-- Auto-Play Controls -->
+    <div class="controls">
+        <button id="autoplay-toggle" class="autoplay-btn">
+            <span id="play-icon">▶</span> AUTO-PLAY
+        </button>
+    </div>
+    <div id="progress" class="progress-bar"></div>
+    <div id="flash"></div>
+    <div id="glitch-overlay">
+        <div class="glitch-slice" style="top: 20%"></div>
+        <div class="glitch-slice" style="top: 50%"></div>
+        <div class="glitch-slice" style="top: 80%"></div>
+    </div>
+
+    <div id="smooth-wrapper">
+        <canvas id="particles-js"></canvas>
+        <!-- Slides will be injected by JavaScript -->
+    </div>
+
+    <script>
+        const allImages = [
+            // OTHER FOLDER (Core Assets)
+            { img: "./other/photo_2026-05-13_13-00-28.jpg", cat: "Vision", title: "GS TRADING", sub: "Reliable • Global • Ahead" },
+            { img: "./other/photo_3_2026-05-13_13-00-59.jpg", cat: "Fleet", title: "PREMIUM POWER", sub: "The Backbone of Logistics" },
+            { img: "./other/photo_4_2026-05-13_13-01-00.jpg", cat: "Fleet", title: "DIVERSE CAPACITY", sub: "Multimodal Logistics Solutions" },
+            { img: "./other/photo_1_2026-05-13_13-00-59.jpg", cat: "Haulage", title: "HEAVY DUTY", sub: "ISUZU Precision Performance" },
+            { img: "./other/photo_25_2026-05-13_13-02-27.jpg", cat: "Logistics", title: "GLOBAL REACH", sub: "Cross-Border Excellence" },
+            { img: "./other/photo_29_2026-05-13_13-02-28.jpg", cat: "Power", title: "CARGO MIGHT", sub: "Managing Large-Scale Shipments" },
+            { img: "./other/photo_60_2026-05-13_13-02-35.jpg", cat: "Legacy", title: "GLOBAL HQ", sub: "Strategic Base in Ethiopia" },
+            { img: "./other/photo_57_2026-05-13_13-02-34.jpg", cat: "Structure", title: "SOLID FOUNDATION", sub: "23 Years of Infrastructure" },
+            { img: "./other/photo_15_2026-05-13_13-02-27.jpg", cat: "Engineering", title: "ELITE GARAGE", sub: "Zero-Downtime Maintenance" },
+            { img: "./other/photo_18_2026-05-13_13-02-27.jpg", cat: "Garage Ops", title: "SERVICE OFFICE", sub: "Technical Support Management" },
+            { img: "./other/photo_17_2026-05-13_13-02-27.jpg", cat: "Service", title: "TECHNICAL MASTERY", sub: "Expert Mechanical Support" },
+            { img: "./other/photo_21_2026-05-13_13-02-27.jpg", cat: "Support", title: "RECOVERY FLEET", sub: "24/7 Roadside Assistance" },
+            { img: "./other/photo_51_2026-05-13_13-02-31.jpg", cat: "Store", title: "GENUINE PARTS", sub: "Fully Integrated Supply Chain" },
+            { img: "./other/photo_59_2026-05-13_13-02-34.jpg", cat: "Inventory", title: "PRECISION STOCK", sub: "Smart Inventory Management" },
+            
+            // MANAGEMENT FOLDER
+            { img: "./mangement/photo_46_2026-05-13_13-02-31.jpg", cat: "Management", title: "MISSION CONTROL", sub: "HD Command & Intelligence" },
+            { img: "./mangement/photo_40_2026-05-13_13-02-30.jpg", cat: "Oversight", title: "EXECUTIVE HUB", sub: "Strategic Decision Making" },
+            { img: "./mangement/photo_41_2026-05-13_13-02-30.jpg", cat: "Tech", title: "NETWORK POWER", sub: "Integrated Data Analytics" },
+            { img: "./mangement/photo_47_2026-05-13_13-02-31.jpg", cat: "Quality", title: "STANDARDS", sub: "Excellence in Management" },
+            
+            // OPERATION FOLDER
+            { img: "./other/photo_29_2026-05-13_13-02-28.jpg", cat: "Dept Office", title: "OPERATIONAL HUB", sub: "Finance & Systems Control" },
+            { img: "./operation/photo_36_2026-05-13_13-02-30.jpg", cat: "Operation", title: "PRECISION LOGISTICS", sub: "Dynamic Fleet Coordination" },
+            { img: "./operation/photo_34_2026-05-13_13-02-29.jpg", cat: "GPS Control", title: "SAFETY OVERSIGHT", sub: "24/7 Monitoring via MaYeT & Mella Systems" },
+            { img: "./operation/photo_2_2026-05-13_13-26-55.jpg", cat: "Systems", title: "INTEGRATED FLOW", sub: "Dynamic Route Optimization" },
+            { img: "./operation/photo_1_2026-05-13_13-26-55.jpg", cat: "Systems", title: "MONITORING", sub: "End-to-End Operational Control" },
+            
+            // FINANCE FOLDER
+            { img: "./financh/photo_12_2026-05-13_13-02-26.jpg", cat: "Finance", title: "FISCAL EXPERTS", sub: "Budget & Asset Management" },
+            { img: "./financh/photo_61_2026-05-13_13-02-35.jpg", cat: "Audit", title: "TRANSPARENCY", sub: "Ensuring Fiscal Integrity" },
+            { img: "./financh/photo_68_2026-05-13_13-02-35.jpg", cat: "Compliance", title: "STRATEGIC AUDIT", sub: "Global Standard Reporting" },
+            { img: "./financh/photo_72_2026-05-13_13-02-35.jpg", cat: "Control", title: "DATA ACCURACY", sub: "Precision Financial Flow" },
+            { img: "./financh/photo_3_2026-05-13_13-02-26.jpg", cat: "Clarity", title: "PROFITABILITY", sub: "Revenue Optimization" },
+            
+            // HR FOLDER
+            { img: "./hr/photo_48_2026-05-13_13-02-31.jpg", cat: "HR", title: "OUR PEOPLE", sub: "The Strength of GS Trading" },
+            { img: "./hr/photo_50_2026-05-13_13-02-31.jpg", cat: "Talent", title: "GROWTH", sub: "Empowering Careers" },
+            
+            // CULTURE & EVENTS
+            { img: "./other/photo_79_2026-05-13_13-02-35.jpg", cat: "Team", title: "EXPERT DRIVERS", sub: "Professional Road Safety" },
+            { img: "./other/photo_80_2026-05-13_13-02-35.jpg", cat: "Rewards", title: "GS EXCELLENCE", sub: "Recognizing Achievement" },
+            { img: "./other/photo_81_2026-05-13_13-02-35.jpg", cat: "Community", title: "WORKFORCE", sub: "United Towards Success" },
+            { img: "./other/photo_82_2026-05-13_13-02-35.jpg", cat: "Training", title: "EDUCATION", sub: "Continuous Skill Mastery" },
+            { img: "./other/photo_83_2026-05-13_13-02-35.jpg", cat: "Unity", title: "TEAM SPIRIT", sub: "Stronger Together" },
+            { img: "./other/photo_84_2026-05-13_13-02-36.jpg", cat: "Vision", title: "DRIVING AHEAD", sub: "Leading the Road" },
+            { img: "./other/photo_86_2026-05-13_13-02-36.jpg", cat: "Conclusion", title: "PARTNER WITH US", sub: "GS Trading PLC" }
+        ];
+
+        let currentSlide = 0;
+        let isAnimating = false;
+        let autoPlayInterval = null;
+        let autoPlayActive = false;
+        let progressInterval = null;
+        const SLIDE_DURATION = 6000; // 6 seconds per slide
+
+        function toggleAutoPlay() {
+            autoPlayActive = !autoPlayActive;
+            const btn = document.getElementById('autoplay-toggle');
+            const icon = document.getElementById('play-icon');
+            const progress = document.getElementById('progress');
+            
+            // UI elements to hide for clean recording
+            const uiElements = document.querySelectorAll('.nav-dots, .controls, .slide-num, .category-tag');
+
+            if (autoPlayActive) {
+                btn.classList.add('active');
+                icon.innerText = '⏸';
+                uiElements.forEach(el => el.style.opacity = '0');
+                btn.parentElement.style.opacity = '0'; // Hide the whole container
+                startAutoPlay();
+            } else {
+                btn.classList.remove('active');
+                icon.innerText = '▶';
+                uiElements.forEach(el => el.style.opacity = '');
+                btn.parentElement.style.opacity = '';
+                stopAutoPlay();
+                progress.style.width = '0%';
+            }
+        }
+
+        // Allow revealing UI on hover at the bottom even during autoplay
+        document.querySelector('.controls').onmouseenter = () => {
+            if(autoPlayActive) document.querySelector('.controls').style.opacity = '1';
+        };
+        document.querySelector('.controls').onmouseleave = () => {
+            if(autoPlayActive) document.querySelector('.controls').style.opacity = '0';
+        };
+
+        function startAutoPlay() {
+            let startTime = Date.now();
+            
+            progressInterval = setInterval(() => {
+                let elapsed = Date.now() - startTime;
+                let percent = (elapsed / SLIDE_DURATION) * 100;
+                document.getElementById('progress').style.width = percent + '%';
+                
+                if (percent >= 100) {
+                    startTime = Date.now();
+                    const nextIndex = (currentSlide + 1) % allImages.length;
+                    goToSlide(nextIndex);
+                }
+            }, 100);
+        }
+
+        function stopAutoPlay() {
+            clearInterval(progressInterval);
+        }
+
+        document.getElementById('autoplay-toggle').onclick = toggleAutoPlay;
+
+        function buildSlides() {
+            const wrapper = document.getElementById('smooth-wrapper');
+            const dotContainer = document.getElementById('dot-container');
+            
+            allImages.forEach((data, i) => {
+                const slide = document.createElement('div');
+                slide.className = `slide ${i === 0 ? 'active' : ''}`;
+                
+                let gpsHtml = '';
+                if (data.isGps) {
+                    gpsHtml = `
+                        <div class="gps-grid"></div>
+                        <div class="truck-marker" style="top: 30%; left: 40%"><div class="marker-pulse"></div><div class="marker-label">3-B10023 EICHER</div><svg viewBox="0 0 24 24" fill="#F47321" class="w-full h-full"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg></div>
+                        <div class="truck-marker" style="top: 60%; left: 55%"><div class="marker-pulse"></div><div class="marker-label">3-65766 ISUZU</div><svg viewBox="0 0 24 24" fill="#2B509A" class="w-full h-full"><path d="M12 2L4.5 20.29l.71.71L12 18l6.79 3 .71-.71z"/></svg></div>
+                    `;
+                }
+
+                slide.innerHTML = `
+                    <div class="slide-bg" style="background-image: url('${data.img}')"></div>
+                    <div class="overlay"></div>
+                    <div class="watermark">
+                        <svg viewBox="0 0 100 100">
+                            <path d="M50 50 L20 10 A45 45 0 0 0 50 90 Z" fill="#F47321" />
+                            <path d="M50 50 L80 90 A45 45 0 0 0 50 10 Z" fill="#2B509A" />
+                        </svg>
+                    </div>
+                    ${gpsHtml}
+                    <div class="category-tag">${data.cat}</div>
+                    <div class="slide-num">${(i + 1).toString().padStart(2, '0')}</div>
+                    <div class="content-wrap">
+                        <h2 class="text-5xl md:text-8xl font-black mb-4 tracking-tighter">${data.title}</h2>
+                        <p class="text-lg md:text-xl text-gs-orange font-bold tracking-[0.3em] uppercase">${data.sub}</p>
+                    </div>
+                `;
+                wrapper.appendChild(slide);
+
+                const dot = document.createElement('div');
+                dot.className = `dot ${i === 0 ? 'active' : ''}`;
+                dot.onclick = () => goToSlide(i);
+                dotContainer.appendChild(dot);
+            });
+        }
+
+        function initIntro() {
+            const tl = gsap.timeline({
+                onComplete: () => {
+                    gsap.to("#intro", {
+                        y: "-100%", duration: 1.5, ease: "expo.inOut", delay: 0.5,
+                        onComplete: () => {
+                            document.getElementById('intro').style.display = 'none';
+                            animateIn(0);
+                            toggleAutoPlay(); // Start Auto-Play automatically
+                        }
+                    });
+                }
+            });
+
+            tl.set(".line-beam", { opacity: 0, scaleY: 0 })
+              .to("#arc-orange", { opacity: 1, rotation: 360, duration: 1.5, ease: "power4.out" })
+              .to("#arc-blue", { opacity: 1, rotation: -360, duration: 1.5, ease: "power4.out" }, "-=1.5")
+              .to(".line-beam", { opacity: 0.5, scaleY: 1.5, stagger: 0.1, duration: 0.8, ease: "power2.out" }, "-=1")
+              .to("#intro-txt", { opacity: 1, y: -20, duration: 1, ease: "back.out" }, "-=0.5")
+              .to("#intro-sub", { opacity: 1, duration: 1 }, "-=0.5")
+              .to("#intro-refl", { opacity: 1, duration: 1.5 }, "-=1.5");
+        }
+
+        function animateIn(index) {
+            const slides = document.querySelectorAll('.slide');
+            const slide = slides[index];
+            const bg = slide.querySelector('.slide-bg');
+            const content = slide.querySelector('.content-wrap');
+            const title = content.querySelector('h2');
+            const sub = content.querySelector('p');
+            
+            slide.classList.add('active');
+            
+            // Ultra Ken Burns for Background
+            gsap.fromTo(bg, { 
+                scale: 1.4, 
+                rotate: -2,
+                xPercent: -5 
+            }, { 
+                scale: 1, 
+                rotate: 2,
+                xPercent: 5,
+                duration: 15, 
+                ease: "linear" 
+            });
+
+            // Cinematic Text Reveal
+            const textTl = gsap.timeline();
+            textTl.fromTo(title, { 
+                y: 100, 
+                skewY: 7,
+                opacity: 0
+            }, { 
+                y: 0, 
+                skewY: 0,
+                opacity: 1, 
+                duration: 1.5, 
+                ease: "expo.out" 
+            })
+            .fromTo(sub, { 
+                x: -50, 
+                opacity: 0,
+                letterSpacing: "1em"
+            }, { 
+                x: 0, 
+                opacity: 0.8,
+                letterSpacing: "0.4em",
+                duration: 1.5, 
+                ease: "expo.out" 
+            }, "-=1.2");
+
+            // Subtle Floating Motion for text
+            gsap.to(content, {
+                y: "-=15",
+                duration: 3,
+                repeat: -1,
+                yoyo: true,
+                ease: "sine.inOut"
+            });
+        }
+
+        function goToSlide(index) {
+            const slides = document.querySelectorAll('.slide');
+            const dots = document.querySelectorAll('.dot');
+            if (isAnimating || index === currentSlide) return;
+            isAnimating = true;
+
+            const prev = slides[currentSlide];
+            const next = slides[index];
+
+            dots[currentSlide].classList.remove('active');
+            dots[index].classList.add('active');
+
+            // --- Unique Animation Logic ---
+            const transitionType = index % 3; // Cycle through 3 types
+
+            if (transitionType === 0) {
+                // Type 1: Wipe Transition
+                gsap.to(prev, { xPercent: -100, duration: 1.2, ease: "expo.inOut", onComplete: () => {
+                    prev.classList.remove('active');
+                    gsap.set(prev, { xPercent: 0 });
+                }});
+                gsap.fromTo(next, { xPercent: 100 }, { xPercent: 0, duration: 1.2, ease: "expo.inOut" });
+            } 
+            else if (transitionType === 1) {
+                // Type 2: Zoom-Flash Transition
+                gsap.to("#flash", { opacity: 0.3, duration: 0.1, yoyo: true, repeat: 1 });
+                gsap.to(prev, { scale: 1.5, opacity: 0, duration: 0.8, ease: "power2.in", onComplete: () => {
+                    prev.classList.remove('active');
+                    gsap.set(prev, { scale: 1, opacity: 1 });
+                }});
+                gsap.fromTo(next, { scale: 0.5, opacity: 0 }, { scale: 1, opacity: 1, duration: 0.8, ease: "power2.out" });
+            }
+            else {
+                // Type 3: Digital Glitch
+                const tl = gsap.timeline();
+                tl.to("#glitch-overlay", { opacity: 1, duration: 0.1 })
+                  .to(".glitch-slice", { opacity: 1, x: "random(-100, 100)", duration: 0.1 })
+                  .to("#glitch-overlay, .glitch-slice", { opacity: 0, duration: 0.1, delay: 0.2 });
+                
+                gsap.to(prev, { opacity: 0, duration: 0.5, onComplete: () => prev.classList.remove('active') });
+                gsap.fromTo(next, { opacity: 0 }, { opacity: 1, duration: 0.8 });
+            }
+
+            currentSlide = index;
+            next.classList.add('active');
+            animateIn(index);
+
+            setTimeout(() => isAnimating = false, 1200);
+        }
+
+        window.addEventListener('wheel', e => {
+            const slides = document.querySelectorAll('.slide');
+            if (isAnimating) return;
+            if (e.deltaY > 0 && currentSlide < slides.length - 1) goToSlide(currentSlide + 1);
+            if (e.deltaY < 0 && currentSlide > 0) goToSlide(currentSlide - 1);
+        });
+
+        // Atmospheric Particles Logic
+        function initParticles() {
+            const canvas = document.getElementById('particles-js');
+            const ctx = canvas.getContext('2d');
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+
+            const particles = [];
+            for (let i = 0; i < 50; i++) {
+                particles.push({
+                    x: Math.random() * canvas.width,
+                    y: Math.random() * canvas.height,
+                    size: Math.random() * 2 + 1,
+                    speedX: Math.random() * 0.5 - 0.25,
+                    speedY: Math.random() * 0.5 - 0.25,
+                    opacity: Math.random() * 0.5
+                });
+            }
+
+            function animate() {
+                ctx.clearRect(0, 0, canvas.width, canvas.height);
+                particles.forEach(p => {
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+                    if (p.x < 0 || p.x > canvas.width) p.speedX *= -1;
+                    if (p.y < 0 || p.y > canvas.height) p.speedY *= -1;
+                    
+                    ctx.beginPath();
+                    ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(255, 255, 255, ${p.opacity})`;
+                    ctx.fill();
+                });
+                requestAnimationFrame(animate);
+            }
+            animate();
+        }
+
+        window.onload = () => {
+            buildSlides();
+            initIntro();
+            initParticles();
+        };
+    </script>
+</body>
+</html>

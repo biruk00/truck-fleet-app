@@ -167,18 +167,18 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
   if (!isOpen) return null;
 
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 sm:p-6 bg-slate-900/40 backdrop-blur-md transition-opacity overflow-y-auto">
-      {/* Click outside to close (optional, but good practice. Disabled here to prevent accidental lost changes) */}
-      <div className="absolute inset-0"></div>
+    <div className="fixed inset-0 z-[100] flex sm:items-center justify-center sm:p-6 bg-slate-900/40 sm:backdrop-blur-md transition-opacity">
+      {/* Click outside to close */}
+      <div className="absolute inset-0 hidden sm:block" onClick={onClose} />
 
-      <div className="relative w-full max-w-2xl bg-white/80 dark:bg-slate-900/80 backdrop-blur-2xl rounded-[2rem] shadow-2xl border border-white/40 dark:border-slate-700/50 my-auto animate-fade-in-up overflow-hidden">
+      <div className="absolute inset-0 sm:relative sm:inset-auto w-full h-[100dvh] sm:h-auto sm:max-h-[90vh] sm:max-w-2xl bg-white dark:bg-slate-900 sm:bg-white/95 sm:dark:bg-slate-900/95 sm:backdrop-blur-2xl rounded-none sm:rounded-[2rem] shadow-2xl border-0 sm:border border-white/40 dark:border-slate-700/50 animate-fade-in-up overflow-hidden flex flex-col">
         
         {/* Header Ribbon Glow */}
         <div className="absolute top-0 left-0 right-0 h-2 bg-gradient-to-r from-orange-500 via-amber-500 to-orange-500 opacity-90"></div>
         <div className="absolute top-0 left-0 right-0 h-8 bg-gradient-to-b from-orange-500/20 to-transparent pointer-events-none"></div>
 
         {/* Modal Header */}
-        <div className="px-8 py-6 border-b border-slate-200/50 dark:border-slate-800/50 flex justify-between items-center relative z-10">
+        <div className="px-5 sm:px-8 py-4 sm:py-6 border-b border-slate-200/50 dark:border-slate-800/50 flex justify-between items-center relative z-10 shrink-0">
           <div>
             <h2 className="text-2xl font-black text-slate-800 dark:text-white tracking-tight flex items-center">
               {isEditing ? 'Edit Vehicle Profile' : 'Register Vehicle'}
@@ -200,25 +200,25 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
             <Loader className="w-8 h-8 text-orange-500 animate-spin" />
           </div>
         ) : (
-          <form onSubmit={handleSubmit} className="p-8 relative z-10">
+          <form onSubmit={handleSubmit} className="p-5 sm:p-8 relative z-10 overflow-y-auto">
             
             {error && (
-              <div className="mb-6 bg-red-50/80 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 p-4 rounded-2xl flex items-start shadow-sm backdrop-blur-sm">
+              <div className="mb-5 bg-red-50/80 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 p-4 rounded-2xl flex items-start shadow-sm backdrop-blur-sm">
                 <AlertCircle className="h-5 w-5 text-red-500 mt-0.5 mr-3 shrink-0" />
                 <p className="text-sm font-semibold text-red-700 dark:text-red-400">{error}</p>
               </div>
             )}
 
-            <div className="space-y-6">
+            <div className="space-y-5">
               
               {/* Row 1: Plate & Status (Required) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                  <label className="block text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                     Plate No <span className="text-orange-500">*</span>
                   </label>
                   <div className="relative">
-                    <div className="absolute inset-y-0 left-0 pl-4 flex items-center pointer-events-none">
+                    <div className="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
                       <Truck className="h-4 w-4 text-slate-400" />
                     </div>
                     <input
@@ -229,13 +229,13 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
                       disabled={isEditing}
                       required
                       placeholder="e.g. ET-123-AA"
-                      className="pl-11 w-full px-4 py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-bold shadow-inner outline-none text-slate-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+                      className="pl-10 w-full px-3 py-2.5 sm:py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-bold shadow-inner outline-none text-slate-900 dark:text-white disabled:opacity-50 disabled:cursor-not-allowed"
                     />
                   </div>
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                  <label className="block text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                     Status <span className="text-orange-500">*</span>
                   </label>
                   <select
@@ -243,7 +243,7 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
                     value={formData.status}
                     onChange={handleChange}
                     required
-                    className="w-full px-4 py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-bold shadow-inner outline-none text-slate-900 dark:text-white"
+                    className="w-full px-3 py-2.5 sm:py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-bold shadow-inner outline-none text-slate-900 dark:text-white"
                   >
                     <option value="" disabled>— Select Status —</option>
                     {STATUSES.map(s => <option key={s} value={s}>{s}</option>)}
@@ -252,9 +252,9 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
               </div>
 
               {/* Row 2: Category & Current Location */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-6">
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                  <label className="block text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                     Category
                   </label>
                   <input
@@ -263,8 +263,8 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
                     list="categories-list"
                     value={formData.category}
                     onChange={handleChange}
-                    placeholder="Select or type category..."
-                    className="w-full px-4 py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-bold shadow-inner outline-none text-slate-900 dark:text-white"
+                    placeholder="Select or type..."
+                    className="w-full px-3 py-2.5 sm:py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-bold shadow-inner outline-none text-slate-900 dark:text-white"
                   />
                   <datalist id="categories-list">
                     {categoriesList.map(c => <option key={c} value={c} />)}
@@ -272,7 +272,7 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                  <label className="block text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                     Current Location
                   </label>
                   <input
@@ -281,53 +281,56 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
                     value={formData.current_location}
                     onChange={handleChange}
                     placeholder="e.g. Debre Birhan"
-                    className="w-full px-4 py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-bold shadow-inner outline-none text-slate-900 dark:text-white"
+                    className="w-full px-3 py-2.5 sm:py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-bold shadow-inner outline-none text-slate-900 dark:text-white"
                   />
                 </div>
               </div>
 
               {/* Row 3: Route (From -> To) */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-5 bg-slate-50/50 dark:bg-slate-900/30 rounded-2xl border border-slate-200/50 dark:border-slate-700/30 shadow-inner">
-                <div className="md:col-span-2">
-                   <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest mb-1">Route Vector</h3>
-                </div>
-                <div className="space-y-1.5 mt-[-1rem]">
-                  <input
-                    type="text"
-                    name="from_location"
-                    value={formData.from_location}
-                    onChange={handleChange}
-                    placeholder="Origin (e.g. Addis Ababa)"
-                    className="w-full px-4 py-3 bg-white/60 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 transition-all text-sm font-semibold outline-none text-slate-900 dark:text-white"
-                  />
-                </div>
-                <div className="space-y-1.5 mt-[-1rem] relative">
-                   {/* Directional Arrow between fields for desktop */}
-                   <div className="hidden md:block absolute -left-5 top-1/2 -translate-y-1/2 text-slate-300 dark:text-slate-600">
-                     &rarr;
-                   </div>
-                  <input
-                    type="text"
-                    name="destination"
-                    value={formData.destination}
-                    onChange={handleChange}
-                    placeholder="Destination (e.g. Djibouti)"
-                    className="w-full px-4 py-3 bg-white/60 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 transition-all text-sm font-semibold outline-none text-slate-900 dark:text-white"
-                  />
+              <div className="p-4 bg-slate-50/50 dark:bg-slate-900/30 rounded-2xl border border-slate-200/50 dark:border-slate-700/30 shadow-inner flex flex-col gap-3">
+                <h3 className="text-[10px] font-bold text-slate-400 dark:text-slate-500 uppercase tracking-widest">Route Vector</h3>
+                
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 relative">
+                  <div className="space-y-1.5">
+                    <input
+                      type="text"
+                      name="from_location"
+                      value={formData.from_location}
+                      onChange={handleChange}
+                      placeholder="Origin (e.g. Addis Ababa)"
+                      className="w-full px-3 py-2.5 sm:py-3 bg-white/60 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 transition-all text-sm font-semibold outline-none text-slate-900 dark:text-white"
+                    />
+                  </div>
+                  
+                  {/* Directional Arrow between fields for desktop */}
+                  <div className="hidden sm:block absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 text-slate-300 dark:text-slate-600 z-10 bg-slate-50/50 dark:bg-slate-900/30 px-1">
+                    &rarr;
+                  </div>
+
+                  <div className="space-y-1.5">
+                    <input
+                      type="text"
+                      name="destination"
+                      value={formData.destination}
+                      onChange={handleChange}
+                      placeholder="Destination (e.g. Djibouti)"
+                      className="w-full px-3 py-2.5 sm:py-3 bg-white/60 dark:bg-slate-800/60 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 transition-all text-sm font-semibold outline-none text-slate-900 dark:text-white"
+                    />
+                  </div>
                 </div>
               </div>
               
               {/* Cargo Type (Specific to Djibouti category) */}
               {(formData.category || '').toLowerCase() === 'djibouti' && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-6 p-5 bg-orange-500/5 dark:bg-orange-500/10 rounded-2xl border border-orange-500/20 dark:border-orange-500/30">
-                  <div className="space-y-1.5">
-                    <label className="block text-xs font-bold uppercase tracking-widest text-orange-500 dark:text-orange-400">
-                      Djibouti Cargo Type
+                <div className="p-4 bg-orange-500/5 dark:bg-orange-500/10 rounded-2xl border border-orange-500/20 dark:border-orange-500/30 flex flex-col sm:flex-row gap-4">
+                  <div className="flex-1 space-y-1.5">
+                    <label className="block text-[11px] font-bold uppercase tracking-widest text-orange-500 dark:text-orange-400">
+                      Djibouti Cargo
                     </label>
                     <select
                       value={cargoType}
                       onChange={(e) => setCargoType(e.target.value)}
-                      className="w-full px-4 py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-bold shadow-inner outline-none text-slate-900 dark:text-white"
+                      className="w-full px-3 py-2.5 sm:py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-bold shadow-inner outline-none text-slate-900 dark:text-white"
                     >
                       <option value="Fertilizer">Fertilizer</option>
                       <option value="Merchant's cargo">Merchant's cargo</option>
@@ -336,17 +339,17 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
                   </div>
 
                   {cargoType === 'Custom' && (
-                    <div className="space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
-                      <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
-                        Specify Cargo Type
+                    <div className="flex-1 space-y-1.5 animate-in fade-in slide-in-from-top-1 duration-200">
+                      <label className="block text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                        Specify Type
                       </label>
                       <input
                         type="text"
                         value={manualCargoType}
                         onChange={(e) => setManualCargoType(e.target.value)}
-                        placeholder="Type cargo name manually..."
+                        placeholder="Type cargo name..."
                         required
-                        className="w-full px-4 py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-bold shadow-inner outline-none text-slate-900 dark:text-white"
+                        className="w-full px-3 py-2.5 sm:py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-bold shadow-inner outline-none text-slate-900 dark:text-white"
                       />
                     </div>
                   )}
@@ -355,7 +358,7 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
 
               {/* Note */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
+                <label className="block text-[11px] font-bold uppercase tracking-widest text-slate-500 dark:text-slate-400">
                   Note / Remarks
                 </label>
                 <textarea
@@ -364,25 +367,25 @@ export default function TruckModal({ isOpen, onClose, plateNo, onSaved }) {
                   onChange={handleChange}
                   rows={2}
                   placeholder="Additional details..."
-                  className="w-full px-4 py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-medium shadow-inner outline-none text-slate-900 dark:text-white resize-none"
+                  className="w-full px-3 py-2.5 sm:py-3 bg-white/50 dark:bg-slate-900/50 border border-slate-200 dark:border-slate-700/50 rounded-xl focus:ring-2 focus:ring-orange-500/50 focus:border-orange-500 transition-all text-sm font-medium shadow-inner outline-none text-slate-900 dark:text-white resize-none"
                 />
               </div>
 
             </div>
 
             {/* ACTIONS */}
-            <div className="mt-8 pt-6 border-t border-slate-100 dark:border-slate-800/50 flex justify-end space-x-3">
+            <div className="mt-6 pt-5 border-t border-slate-100 dark:border-slate-800/50 flex flex-col sm:flex-row justify-end gap-3 pb-8 sm:pb-0">
               <button
                 type="button"
                 onClick={onClose}
-                className="px-6 py-3 text-sm font-bold text-slate-500 dark:text-slate-400 bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-all hover:shadow-sm"
+                className="w-full sm:w-auto px-6 py-3 text-sm font-bold text-slate-500 dark:text-slate-400 bg-white/50 dark:bg-slate-800/50 border border-slate-200 dark:border-slate-700/50 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-700 transition-all hover:shadow-sm order-2 sm:order-1"
               >
                 Cancel
               </button>
               <button
                 type="submit"
                 disabled={saving}
-                className="inline-flex items-center px-8 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white text-sm font-bold rounded-xl shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:shadow-[0_0_20px_rgba(249,115,22,0.5)] transition-all hover:-translate-y-0.5 group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none"
+                className="w-full sm:w-auto inline-flex justify-center items-center px-8 py-3 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white text-sm font-bold rounded-xl shadow-[0_0_15px_rgba(249,115,22,0.3)] hover:shadow-[0_0_20px_rgba(249,115,22,0.5)] transition-all hover:-translate-y-0.5 group disabled:opacity-50 disabled:cursor-not-allowed disabled:transform-none disabled:shadow-none order-1 sm:order-2"
               >
                 {saving ? (
                   <>
